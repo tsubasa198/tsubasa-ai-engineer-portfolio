@@ -1118,3 +1118,188 @@ img, video { max-width: 100%; }
     color: #bbc5d0;
   }
 }
+
+/* Touch layout final cascade. These rules intentionally stop at 1279px. */
+@media (max-width: 1279px) {
+  .animated-portfolio .motion-stage-section,
+  .animated-portfolio .motion-stage-section .motion-stage { height: auto !important; min-height: 0 !important; overflow: visible !important; }
+  .animated-portfolio .hero-motion .hero-stage { height: 100svh !important; min-height: clamp(560px, 100svh, 900px) !important; padding: 0 var(--touch-page-padding); overflow: hidden !important; }
+  .animated-portfolio .hero-stage .hero-copy { position: relative; inset: auto; max-width: none; padding-top: clamp(150px, 22vh, 230px); }
+  .animated-portfolio .hero-stage .hero-copy h1 { max-width: 100%; font-size: clamp(42px, 5.2vw, 68px); line-height: 1.16; }
+  .animated-portfolio .hero-stage .hero-line > span { white-space: normal; }
+  .animated-portfolio .hero-core-wrap { top: auto; right: auto; width: min(54vw, 560px); height: 42vh; margin: 4vh 0 0 auto; }
+  .animated-portfolio .hero-bridge-copy { display: none; }
+
+  .animated-portfolio .about-stage,
+  .animated-portfolio .workflow-stage,
+  .animated-portfolio .skills-stage,
+  .animated-portfolio .works-transition-stage { padding: var(--touch-section-padding) var(--touch-page-padding); }
+  .animated-portfolio .about-layout { height: auto; display: grid; grid-template-columns: minmax(0, .45fr) minmax(0, .55fr); grid-template-areas: "visual copy"; align-items: center; gap: clamp(28px, 5vw, 72px); max-width: 1180px; margin: 0 auto; padding-top: 0; }
+  .animated-portfolio .about-visual { grid-area: visual; min-height: clamp(300px, 48vw, 520px); margin: 0; }
+  .animated-portfolio .about-copy { grid-area: copy; max-width: none; }
+  .animated-portfolio .about-copy h2 { max-width: none; font-size: clamp(36px, 4.5vw, 58px); line-height: 1.14; }
+  .animated-portfolio .about-copy p:not(.eyebrow) { font-size: 16px; line-height: 1.8; }
+  .animated-portfolio .about-portrait { width: auto; height: 94%; max-width: 92%; }
+
+  .animated-portfolio .workflow-heading,
+  .animated-portfolio .workflow-track,
+  .animated-portfolio .workflow-complete,
+  .animated-portfolio .skills-heading,
+  .animated-portfolio .skills-network,
+  .animated-portfolio .skills-number,
+  .animated-portfolio .skills-panels,
+  .animated-portfolio .skills-to-works,
+  .animated-portfolio .works-transition-heading,
+  .animated-portfolio .gallery-camera { position: relative; inset: auto; left: auto; right: auto; top: auto; bottom: auto; width: auto; max-width: 1180px; min-height: 0; height: auto; margin-left: auto; margin-right: auto; transform: none !important; }
+  .animated-portfolio .workflow-heading { margin-bottom: clamp(42px, 7vh, 84px); }
+  .animated-portfolio .workflow-heading h2,
+  .animated-portfolio .skills-heading h2,
+  .animated-portfolio .works-transition-heading h2 { font-size: clamp(38px, 4.8vw, 62px); line-height: 1.12; }
+  .animated-portfolio .workflow-support,
+  .animated-portfolio .skills-support { max-width: 620px; margin: 20px 0 0; font-size: 16px; line-height: 1.8; }
+  .animated-portfolio .workflow-track { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--touch-card-gap); padding: 0; }
+  .animated-portfolio .workflow-track-line,
+  .animated-portfolio .workflow-connector,
+  .animated-portfolio .workflow-moving-dot { display: none; }
+  .animated-portfolio .workflow-card { position: relative; inset: auto; min-height: 0; height: auto; padding: clamp(22px, 3vw, 32px); overflow: visible; }
+  .animated-portfolio .workflow-card-copy h3 { font-size: clamp(20px, 2.6vw, 28px); }
+  .animated-portfolio .workflow-card-copy p { font-size: 16px; line-height: 1.8; }
+  .animated-portfolio .workflow-complete { margin-top: clamp(44px, 7vh, 84px); font-size: 16px; line-height: 1.8; text-align: center; }
+
+  .animated-portfolio .skills-network { width: min(34vw, 360px); height: min(34vw, 360px); margin: clamp(48px, 8vh, 88px) auto clamp(42px, 7vh, 76px); }
+  .animated-portfolio .skills-panels { display: grid; gap: 0; }
+  .animated-portfolio .skill-panel { position: relative; margin: 0; padding: 24px 0; border-top: 1px solid rgba(255,255,255,.14); pointer-events: auto !important; }
+  .animated-portfolio .skill-panel h3 { font-size: clamp(22px, 3vw, 32px); }
+  .animated-portfolio .skill-panel span { font-size: 16px; line-height: 1.8; }
+  .animated-portfolio .skills-to-works { justify-content: flex-start; margin-top: 48px; }
+
+  .animated-portfolio .works-transition-stage { perspective: none; }
+  .animated-portfolio .works-transition-stage .gallery-camera { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--touch-card-gap); padding-top: clamp(44px, 7vh, 76px); transform-style: flat; will-change: auto; }
+  .animated-portfolio .works-transition-stage .gallery-card,
+  .animated-portfolio .works-transition-stage .gallery-card.major-work-card { position: relative; inset: auto; left: auto; top: auto; width: 100% !important; max-width: none; border-radius: 14px; }
+  .animated-portfolio .works-transition-stage .gallery-card.support-work-card { display: none; }
+  .animated-portfolio .works-transition-stage .gallery-card-image { aspect-ratio: 16 / 9; overflow: hidden; }
+  .animated-portfolio .works-transition-stage .gallery-card-image img { width: 100%; height: 100%; object-fit: cover; }
+  .animated-portfolio .works-transition-stage .gallery-card-info { padding: 18px 18px 20px; }
+  .animated-portfolio .works-transition-stage .gallery-card-info strong { font-size: clamp(17px, 2.2vw, 24px); }
+  .animated-portfolio .works-transition-stage .gallery-card-link-label { min-height: 44px; display: inline-flex; align-items: center; opacity: 1; }
+  .animated-portfolio .works-transition-stage .works-seed,
+  .animated-portfolio .works-transition-stage .works-transition-grid { display: none; }
+
+  .animated-portfolio .contact-section { min-height: auto; padding: var(--touch-section-padding) var(--touch-page-padding) calc(var(--touch-section-padding) + env(safe-area-inset-bottom)); }
+  .animated-portfolio .contact-copy { max-width: 760px; margin-left: 0; }
+  .animated-portfolio .contact-copy h2 { font-size: clamp(38px, 5vw, 62px); line-height: 1.14; }
+  .animated-portfolio .contact-copy > p:not(.eyebrow) { max-width: 560px; font-size: 16px; line-height: 1.8; }
+  .animated-portfolio .contact-button { min-height: 48px; }
+  .animated-portfolio .site-footer { padding-bottom: calc(24px + env(safe-area-inset-bottom)); }
+  .animated-portfolio .site-header { padding-top: max(16px, env(safe-area-inset-top)); padding-right: calc(var(--touch-page-padding) + env(safe-area-inset-right)); padding-left: calc(var(--touch-page-padding) + env(safe-area-inset-left)); }
+  .animated-portfolio .menu-button { width: 44px; min-width: 44px; height: 44px; padding: 0 8px; }
+  .animated-portfolio .menu-panel { padding-top: calc(96px + env(safe-area-inset-top)); padding-right: calc(var(--touch-page-padding) + env(safe-area-inset-right)); padding-bottom: calc(40px + env(safe-area-inset-bottom)); padding-left: calc(var(--touch-page-padding) + env(safe-area-inset-left)); overflow-y: auto; }
+  .animated-portfolio .scroll-dial { width: 58px; height: 58px; left: calc(16px + env(safe-area-inset-left)); bottom: calc(16px + env(safe-area-inset-bottom)); }
+  .animated-portfolio .hero-copy,
+  .animated-portfolio .hero-copy .eyebrow,
+  .animated-portfolio .hero-line > span,
+  .animated-portfolio .hero-core-wrap,
+  .animated-portfolio .about-copy,
+  .animated-portfolio .about-copy .eyebrow,
+  .animated-portfolio .about-copy h2,
+  .animated-portfolio .about-copy > p:not(.eyebrow),
+  .animated-portfolio .about-tags,
+  .animated-portfolio .about-visual,
+  .animated-portfolio .about-visual-glow,
+  .animated-portfolio .about-portrait,
+  .animated-portfolio .about-visual-node,
+  .animated-portfolio .about-visual-caption,
+  .animated-portfolio .workflow-card,
+  .animated-portfolio .workflow-complete,
+  .animated-portfolio .skills-heading,
+  .animated-portfolio .skills-network,
+  .animated-portfolio .skill-panel,
+  .animated-portfolio .skills-to-works,
+  .animated-portfolio .works-transition-heading,
+  .animated-portfolio .works-line,
+  .animated-portfolio .gallery-card { opacity: 1 !important; visibility: visible !important; transform: none !important; }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .animated-portfolio { --touch-page-padding: clamp(28px, 6vw, 56px); }
+  .animated-portfolio .about-layout { grid-template-columns: minmax(0, 1fr); grid-template-areas: "copy" "visual"; gap: 48px; }
+  .animated-portfolio .about-visual { min-height: clamp(320px, 48vw, 500px); }
+  .animated-portfolio .workflow-track { grid-template-columns: 1fr; }
+  .animated-portfolio .skills-network,
+  .animated-portfolio .skills-number { display: none; }
+  .animated-portfolio .skills-panels { margin-top: 48px; }
+}
+
+@media (max-width: 767px) {
+  .animated-portfolio { --touch-page-padding: 22px; --touch-section-padding: clamp(64px, 12vh, 104px); --mobile-hero-copy-top: clamp(220px, 33.5dvh, 330px); --mobile-hero-hologram-top: clamp(108px, 16svh, 168px); }
+  .animated-portfolio .hero-stage .hero-copy { position: absolute; top: var(--mobile-hero-copy-top); bottom: auto; left: calc(20px + env(safe-area-inset-left)); right: calc(20px + env(safe-area-inset-right)); display: block; min-height: 0; padding: 0; transform: none; }
+  .animated-portfolio .hero-stage .hero-copy h1 { font-size: clamp(34px, 9.1vw, 46px); line-height: 1.14; letter-spacing: -.075em; }
+  .animated-portfolio .hero-stage .hero-copy .eyebrow { margin-bottom: clamp(16px, 2.2svh, 22px); }
+  .animated-portfolio .menu-panel { background: rgba(5,7,10,.985); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+  .animated-portfolio .hero-core-wrap { position: absolute; top: var(--mobile-hero-hologram-top); right: -28vw; width: 88vw; height: 42vh; margin: 0; }
+  .animated-portfolio .about-layout { grid-template-columns: minmax(0, 1fr); grid-template-areas: "copy" "visual"; gap: 40px; }
+  .animated-portfolio .about-visual { min-height: clamp(280px, 78vw, 360px); }
+  .animated-portfolio .about-copy h2,
+  .animated-portfolio .workflow-heading h2,
+  .animated-portfolio .skills-heading h2,
+  .animated-portfolio .works-transition-heading h2,
+  .animated-portfolio .contact-copy h2 { font-size: clamp(34px, 9.6vw, 48px); }
+  .animated-portfolio .workflow-track { grid-template-columns: 1fr; gap: 22px; padding-left: 28px; }
+  .animated-portfolio .workflow-track::before { content: ""; position: absolute; top: 18px; bottom: 18px; left: 8px; width: 1px; background: rgba(255,255,255,.16); }
+  .animated-portfolio .workflow-card { padding: 22px 18px 30px; }
+  .animated-portfolio .workflow-card-copy p,
+  .animated-portfolio .about-copy p:not(.eyebrow),
+  .animated-portfolio .skills-support,
+  .animated-portfolio .skill-panel span,
+  .animated-portfolio .workflow-complete,
+  .animated-portfolio .contact-copy > p:not(.eyebrow) { font-size: 16px; line-height: 1.8; }
+  .animated-portfolio .skills-network,
+  .animated-portfolio .skills-number { display: none; }
+  .animated-portfolio .works-transition-stage .gallery-camera { grid-template-columns: 1fr; gap: 18px; }
+  .animated-portfolio .scroll-dial { display: none; }
+}
+
+@media (max-width: 390px) {
+  .animated-portfolio { --mobile-hero-copy-top: clamp(220px, 33.5dvh, 300px); --mobile-hero-hologram-top: clamp(96px, 15svh, 145px); }
+  .animated-portfolio .hero-stage .hero-copy h1 { font-size: clamp(32px, 8.8vw, 38px); line-height: 1.12; }
+  .animated-portfolio .about-tags { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .animated-portfolio .about-tags span { min-width: 0; padding: 8px 7px; font-size: 10px; line-height: 1.35; text-align: center; white-space: nowrap; }
+}
+
+@media (max-width: 390px) and (max-height: 650px) {
+  .animated-portfolio { --mobile-hero-copy-top: clamp(117px, 22svh, 132px); --mobile-hero-hologram-top: clamp(64px, 12svh, 78px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animated-portfolio .motion-stage-section,
+  .animated-portfolio .motion-stage-section .motion-stage { height: auto !important; min-height: 0 !important; overflow: visible !important; }
+  .animated-portfolio .hero-stage { min-height: 100svh !important; background: #05070a url("/assets/hero/0713-poster.jpg") center / cover no-repeat; }
+  .animated-portfolio .hero-video,
+  .animated-portfolio .scroll-guide { display: none; }
+  .animated-portfolio .hero-copy,
+  .animated-portfolio .hero-copy .eyebrow,
+  .animated-portfolio .hero-line > span,
+  .animated-portfolio .hero-core-wrap,
+  .animated-portfolio .about-copy,
+  .animated-portfolio .about-copy .eyebrow,
+  .animated-portfolio .about-copy h2,
+  .animated-portfolio .about-copy > p:not(.eyebrow),
+  .animated-portfolio .about-tags,
+  .animated-portfolio .about-visual,
+  .animated-portfolio .about-visual-glow,
+  .animated-portfolio .about-portrait,
+  .animated-portfolio .about-visual-node,
+  .animated-portfolio .about-visual-caption,
+  .animated-portfolio .workflow-card,
+  .animated-portfolio .workflow-complete,
+  .animated-portfolio .skills-heading,
+  .animated-portfolio .skills-network,
+  .animated-portfolio .skills-number,
+  .animated-portfolio .skill-panel,
+  .animated-portfolio .skills-to-works,
+  .animated-portfolio .works-transition-heading,
+  .animated-portfolio .works-line,
+  .animated-portfolio .gallery-card { opacity: 1 !important; visibility: visible !important; transform: none !important; }
+  .animated-portfolio .works-transition-stage .gallery-card.support-work-card { display: block; }
+}
