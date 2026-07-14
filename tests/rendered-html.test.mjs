@@ -48,7 +48,7 @@ test("keeps the portfolio metadata and implementation self-contained", async () 
   assert.match(data, /featured\?: boolean/);
   assert.match(data, /featured: true/);
   assert.match(layout, /lang="ja"/);
-  assert.match(layout, /Noto_Sans_JP/);
+  assert.match(layout, /@fontsource-variable\/noto-sans-jp/);
   assert.match(layout, /Tsubasa's Portfolio/);
   assert.match(styles, /\.scroll-progress/);
   assert.match(styles, /\.workflow-track/);

@@ -293,10 +293,10 @@ a { text-decoration: none; }
 
 /* Final motion pass: Noto Sans JP, visible hero film, one pinned works stage */
 @theme inline {
-  --font-sans: var(--font-noto-sans-jp), "Noto Sans JP", sans-serif;
+  --font-sans: "Noto Sans JP Variable", "Noto Sans JP", sans-serif;
 }
 
-body { font-family: var(--font-noto-sans-jp), "Noto Sans JP", sans-serif; }
+body { font-family: "Noto Sans JP Variable", "Noto Sans JP", sans-serif; }
 .hero-video { opacity: .86; filter: brightness(.82) saturate(.92) contrast(1.04); }
 .hero-video-overlay { background: radial-gradient(circle at 71% 49%, rgba(80,118,255,.14), transparent 34%), linear-gradient(90deg, rgba(5,7,10,.22) 0%, rgba(5,7,10,.13) 42%, rgba(5,7,10,.09) 72%, rgba(5,7,10,.2) 100%), linear-gradient(0deg, rgba(5,7,10,.2), transparent 55%, rgba(5,7,10,.08)); }
 .hero-stage .hero-copy { will-change: transform, opacity; }
