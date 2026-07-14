@@ -22,7 +22,7 @@ test("server-renders the AI engineer portfolio", async () => {
   const html = await response.text();
   assert.match(html, /Tsubasa&#x27;s Portfolio \| AI Engineer \/ FDE/i);
   assert.match(html, /まだ言葉になっていない/);
-  assert.match(html, /AIで使われる仕組みに変える/);
+  assert.match(html, /AIで解決する/);
   assert.match(html, /SELECTED WORKS/);
   assert.match(html, /現場ヒアリング・課題特定/);
   assert.match(html, /課題を解決する/);
