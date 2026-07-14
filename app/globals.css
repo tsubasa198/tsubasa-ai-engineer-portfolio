@@ -72,7 +72,7 @@
 }
 
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
+html { scroll-behavior: auto; }
 body { margin: 0; background: var(--paper); color: var(--ink); font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif; }
 button, a { color: inherit; font: inherit; }
 button { border: 0; background: transparent; cursor: pointer; }
@@ -525,6 +525,12 @@ h1, h2, h3, h4, strong, .brand-mark span, .menu-panel > a { font-weight: 700; }
 /* Responsive system: keep the desktop composition, change the stage on smaller screens. */
 html, body { overflow-x: hidden; }
 img, video { max-width: 100%; }
+
+/* PC viewport tiers are assigned by the motion controller. Phase 1 keeps the existing visual values. */
+.animated-portfolio[data-pc-tier="large"] { --pc-tier: large; }
+.animated-portfolio[data-pc-tier="standard"] { --pc-tier: standard; }
+.animated-portfolio[data-pc-tier="compact"] { --pc-tier: compact; }
+.animated-portfolio[data-pc-tier="other"] { --pc-tier: other; }
 
 @media (min-width: 561px) and (max-width: 1023px) {
   .site-header { padding: 22px clamp(22px, 4vw, 42px); }

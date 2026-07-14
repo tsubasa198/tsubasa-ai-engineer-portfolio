@@ -35,6 +35,37 @@ const galleryCards = [
 const featuredProject = projects.find((project) => project.featured) ?? projects[0];
 const featuredCardId = galleryCards.find((card) => card.projectId === featuredProject.id)?.id ?? galleryCards[0].id;
 
+type PcTier = "large" | "standard" | "compact" | "other";
+
+type ViewportProfile = {
+  width: number;
+  height: number;
+  isMobile: boolean;
+  isTablet: boolean;
+  pcTier: PcTier;
+};
+
+function getViewportProfile(): ViewportProfile {
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+  const isCompact = height <= 900 || (width >= 1280 && width <= 1439);
+  const pcTier: PcTier = isCompact
+    ? "compact"
+    : width >= 1800 && height >= 901
+      ? "large"
+      : width >= 1440 && width <= 1799 && height >= 901
+        ? "standard"
+        : "other";
+
+  return {
+    width,
+    height,
+    isMobile: width <= 767,
+    isTablet: width >= 768 && width <= 1023,
+    pcTier,
+  };
+}
+
 function Header() {
   const [open, setOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -206,85 +237,88 @@ export default function Home() {
   useLayoutEffect(() => {
     const root = rootRef.current;
     if (!root || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const responsive = gsap.matchMedia();
-    let isMobile = false;
-    let isTablet = false;
-    responsive.add({ mobile: "(max-width: 767px)", tablet: "(min-width: 768px) and (max-width: 1023px)", desktop: "(min-width: 1024px)" }, ({ conditions }) => {
-      isMobile = Boolean(conditions?.mobile);
-      isTablet = Boolean(conditions?.tablet);
-    });
-    const lenis = new Lenis({ lerp: isMobile ? .12 : .08, smoothWheel: !isMobile, syncTouch: isMobile });
+    let disposed = false;
+    let activeProfile = getViewportProfile();
+    let resizeTimer = 0;
+    let rebuildTimer = 0;
+    let motionContext: gsap.Context | null = null;
+    let pageTriggers: ScrollTrigger[] = [];
+    let pageTimelines: gsap.core.Timeline[] = [];
+    const lenis = new Lenis({ lerp: activeProfile.isMobile ? .12 : .08, smoothWheel: !activeProfile.isMobile, syncTouch: activeProfile.isMobile });
     const raf = (time: number) => { lenis.raf(time * 1000); };
     gsap.ticker.add(raf);
-    let snapTimer = 0;
-    let onUserWheel: (() => void) | undefined;
-    let onLenisScroll: (() => void) | undefined;
-    const ctx = gsap.context(() => {
-      const snap = { snapTo: "labelsDirectional" as const, delay: isTablet ? .18 : .12, duration: { min: isTablet ? .2 : .25, max: isTablet ? .5 : .65 }, ease: "power2.inOut", inertia: false };
-      const snapTriggers: ReturnType<typeof ScrollTrigger.create>[] = [];
-      const pin = (section: string, stage: string, animation: gsap.core.Timeline, snapEnabled = false) => { const trigger = ScrollTrigger.create({ trigger: section, start: "top top", end: "bottom bottom", pin: stage, scrub: isTablet ? .75 : .9, animation, ...(!isMobile && snapEnabled ? { snap } : {}), invalidateOnRefresh: true }); if (!isMobile && snapEnabled) snapTriggers.push(trigger); return trigger; };
-      let hasUserScrolled = false;
-      let isLenisSnapping = false;
-      let lastObservedScroll = window.scrollY;
-      let scrollDirection = 1;
-      const clearSnap = () => { window.clearTimeout(snapTimer); if (isLenisSnapping) lenis.scrollTo(window.scrollY, { immediate: true }); isLenisSnapping = false; };
-      const snapLenisToLabel = () => {
-        if (!hasUserScrolled || isLenisSnapping) return;
-        const trigger = snapTriggers.find((item) => item.isActive && item.animation);
-        if (!trigger?.animation) return;
-        const animation = trigger.animation as gsap.core.Timeline;
-        const duration = animation.duration();
-        const currentTime = duration * animation.totalProgress();
-        const labelTimes = Object.values(animation.labels).sort((a, b) => a - b);
-        const direction = scrollDirection;
-        const epsilon = duration * .025;
-        const nextLabel = direction >= 0 ? labelTimes.find((time) => time > currentTime + epsilon) : [...labelTimes].reverse().find((time) => time < currentTime - epsilon);
-        const targetTime = nextLabel ?? (direction >= 0 ? labelTimes[labelTimes.length - 1] : labelTimes[0]);
-        if (targetTime === undefined) return;
-        const targetProgress = targetTime / duration;
-        const targetScroll = trigger.start + (trigger.end - trigger.start) * targetProgress;
-        if (Math.abs(targetScroll - window.scrollY) < 10) return;
-        isLenisSnapping = true;
-        lenis.scrollTo(targetScroll, { duration: isMobile ? .28 : .55, easing: (value) => 1 - Math.pow(1 - value, 3), onComplete: () => { isLenisSnapping = false; ScrollTrigger.update(); } });
-        window.setTimeout(() => { isLenisSnapping = false; }, isMobile ? 550 : 950);
-      };
-      onLenisScroll = () => { const currentScroll = window.scrollY; if (Math.abs(currentScroll - lastObservedScroll) > 1) scrollDirection = currentScroll >= lastObservedScroll ? 1 : -1; lastObservedScroll = currentScroll; ScrollTrigger.update(); if (!hasUserScrolled || isLenisSnapping) return; window.clearTimeout(snapTimer); snapTimer = window.setTimeout(snapLenisToLabel, isMobile ? 190 : 145); };
-      onUserWheel = () => { hasUserScrolled = true; clearSnap(); };
-      lenis.on("scroll", onLenisScroll);
-      window.addEventListener("wheel", onUserWheel, { passive: true });
-      window.addEventListener("touchstart", onUserWheel, { passive: true });
+    const onLenisScroll = () => { ScrollTrigger.update(); };
+    lenis.on("scroll", onLenisScroll);
 
-      if (isMobile) {
+    const restoreMotionStyles = () => {
+      const resetTargets = root.querySelectorAll<HTMLElement>([
+        ".hero-video-overlay", ".hero-copy", ".hero-copy .eyebrow", ".hero-copy .hero-lead", ".hero-copy .hero-line > span", ".hero-core-wrap", ".hero-core", ".hero-core .core-orbit", ".hero-bridge-copy",
+        ".about-motion .bridge-core", ".about-motion .bridge-core .core-orbit", ".about-motion .about-copy", ".about-motion .about-visual-line", ".about-motion .about-visual-node",
+        ".workflow-motion .workflow-card", ".workflow-motion .graphic-ring", ".workflow-motion .graphic-dot", ".workflow-motion .workflow-connector", ".workflow-motion .workflow-complete", ".workflow-motion .workflow-to-skills",
+        ".skills-motion .skill-panel", ".skills-motion .skills-number", ".skills-motion .network-ring", ".skills-motion .skills-network", ".skills-motion .skills-heading", ".skills-motion .skills-to-works",
+        ".works-transition-motion .works-line", ".works-transition-motion .works-transition-heading", ".works-transition-motion .works-seed", ".works-transition-motion .gallery-camera", ".works-transition-motion .works-transition-note", ".works-transition-motion .works-transition-meta",
+      ].join(","));
+      gsap.set(resetTargets, { clearProps: "all" });
+      galleryCards.forEach((card) => {
+        const element = root.querySelector<HTMLElement>(`[data-gallery-card="${card.id}"]`);
+        if (!element) return;
+        gsap.set(element, { clearProps: "all" });
+        gsap.set(element, { "--gx": card.x, "--gy": card.y, "--gz": card.z, "--gr": card.r, "--gs": card.s });
+      });
+    };
+
+    const cleanupMotion = () => {
+      pageTriggers.forEach((trigger) => trigger.kill());
+      pageTriggers = [];
+      pageTimelines.forEach((timeline) => timeline.kill());
+      pageTimelines = [];
+      motionContext?.revert();
+      motionContext = null;
+      restoreMotionStyles();
+    };
+
+    const buildMotion = (profile: ViewportProfile) => {
+      root.dataset.pcTier = profile.pcTier;
+      motionContext = gsap.context(() => {
+        const pin = (section: string, stage: string, animation: gsap.core.Timeline) => {
+          const trigger = ScrollTrigger.create({ trigger: section, start: "top top", end: "bottom bottom", pin: stage, scrub: profile.isTablet ? .75 : .9, animation, invalidateOnRefresh: true });
+          pageTriggers.push(trigger);
+          return trigger;
+        };
+
+        if (profile.isMobile) {
         gsap.set(".hero-motion .hero-copy", { opacity: 1, y: 0 });
         gsap.set(".hero-motion .hero-copy .eyebrow, .hero-motion .hero-copy .hero-lead, .hero-motion .hero-copy .hero-line > span", { opacity: 1, y: 0 });
         gsap.set(".hero-motion .hero-core-wrap", { opacity: .72, scale: .84 });
-      } else {
+        } else {
         gsap.set(".hero-motion .hero-copy", { opacity: 0, y: 24 });
         gsap.set(".hero-motion .hero-copy .eyebrow, .hero-motion .hero-copy .hero-lead", { opacity: 0, y: 15 });
         gsap.set(".hero-motion .hero-copy .hero-line > span", { opacity: 0, y: "105%" });
         gsap.set(".hero-motion .hero-core-wrap", { opacity: .08, scale: .88 });
-        const hero = gsap.timeline().addLabel("video", 0).to(".hero-motion .hero-video-overlay", { opacity: .52, duration: .2 }, .2).addLabel("label-visible", .3).to(".hero-motion .hero-copy", { opacity: 1, y: 0, duration: .01 }, .29).to(".hero-motion .hero-copy .eyebrow", { opacity: 1, y: 0, letterSpacing: ".22em", duration: .14 }, .3).to(".hero-motion .hero-copy .hero-line > span", { opacity: 1, y: "0%", duration: .18, stagger: .08, ease: "power3.out" }, .38).addLabel("headline-visible", .74).to(".hero-motion .hero-copy .hero-lead", { opacity: 1, y: 0, duration: .17 }, .58).addLabel("hero-complete", .82).to(".hero-motion .hero-core-wrap", { opacity: 1, scale: 1, duration: .35 }, .64).to(".hero-motion .hero-core", { x: "-18vw", y: "8vh", scale: .75, duration: .55 }, .72).to(".hero-motion .core-orbit", { rotation: "+=55", scale: 1.18, stagger: .05, duration: .55 }, .72).addLabel("hero-exit", .9).to(".hero-motion .hero-copy", { x: "-8vw", opacity: 0, duration: .2 }, .9).fromTo(".hero-motion .hero-bridge-copy", { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: .18 }, .94);
-        pin(".hero-motion", ".hero-stage", hero, true);
-      }
+        const hero = gsap.timeline().addLabel("video", 0).to(".hero-motion .hero-video-overlay", { opacity: .52, duration: .2 }, .2).addLabel("label-visible", .3).to(".hero-motion .hero-copy", { opacity: 1, y: 0, duration: .01 }, .29).to(".hero-motion .hero-copy .eyebrow", { opacity: 1, y: 0, letterSpacing: ".22em", duration: .14 }, .3).to(".hero-motion .hero-copy .hero-line > span", { opacity: 1, y: "0%", duration: .18, stagger: .08, ease: "power3.out" }, .38).addLabel("headline-visible", .74).to(".hero-motion .hero-copy .hero-lead", { opacity: 1, y: 0, duration: .17 }, .58).to(".hero-motion .hero-core-wrap", { opacity: 1, scale: 1, duration: .35 }, .64).to(".hero-motion .hero-core", { x: "-18vw", y: "8vh", scale: .75, duration: .55 }, .72).to(".hero-motion .core-orbit", { rotation: "+=55", scale: 1.18, stagger: .05, duration: .55 }, .72).addLabel("hero-exit", .9).to(".hero-motion .hero-copy", { x: "-8vw", opacity: 0, duration: .2 }, .9).fromTo(".hero-motion .hero-bridge-copy", { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: .18 }, .94).addLabel("hero-complete");
+        pageTimelines.push(hero);
+        pin(".hero-motion", ".hero-stage", hero);
+        }
 
-      if (isMobile) {
+        if (profile.isMobile) {
         gsap.set(".about-motion .about-copy", { opacity: 1, y: 0 });
         gsap.set(".about-motion .about-visual-line", { scaleY: 1 });
-      } else {
+        } else {
         const about = gsap.timeline().to(".about-motion .bridge-core", { x: "-12vw", y: "-8vh", scale: .72, duration: .35 }, 0).to(".about-motion .bridge-core .core-orbit", { rotation: "+=70", stagger: .06, duration: .5 }, 0).fromTo(".about-motion .about-copy", { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: .25 }, .22).fromTo(".about-motion .about-visual-line", { scaleY: 0 }, { scaleY: 1, duration: .2 }, .42).to(".about-motion .bridge-core .node-a", { x: "-10vw", y: "-7vh", duration: .22 }, .45).to(".about-motion .bridge-core .node-b", { x: "10vw", y: "7vh", duration: .22 }, .45);
+        pageTimelines.push(about);
         pin(".about-motion", ".about-stage", about);
-      }
+        }
 
       const workflowCards = gsap.utils.toArray<HTMLElement>(".workflow-motion .workflow-card");
       const workflowRings = workflowCards.map((card) => gsap.utils.toArray<HTMLElement>(".graphic-ring", card));
       const workflowDots = workflowCards.map((card) => card.querySelector<HTMLElement>(".graphic-dot"));
-      if (isMobile) {
+      if (profile.isMobile) {
         gsap.set(workflowCards, { opacity: 1, scale: 1, y: 0 });
         gsap.set(workflowRings.flat(), { scale: 1, opacity: 1, transformOrigin: "center center" });
         gsap.set(workflowDots.filter(Boolean), { opacity: 1, scale: 1, transformOrigin: "center center" });
       } else {
         const workflowTl = gsap.timeline();
-        workflowTl.addLabel("step-01", .1).addLabel("step-02", .38).addLabel("step-03", .69).addLabel("step-04", 1.02).addLabel("workflow-complete", 1.36);
+        workflowTl.addLabel("step-01", .1).addLabel("step-02", .38).addLabel("step-03", .69).addLabel("step-04", 1.02);
         gsap.set(workflowCards, { opacity: .2, scale: .94, y: 18 });
         gsap.set(workflowCards[0], { opacity: 1, scale: 1.035, y: 0 });
         gsap.set(workflowRings.flat(), { scale: .96, opacity: .42, transformOrigin: "center center" });
@@ -292,26 +326,27 @@ export default function Home() {
         gsap.set(workflowRings[0], { scale: 1.12, opacity: 1 });
         gsap.set(workflowDots[0], { opacity: 1, scale: 1.2 });
         gsap.set(".workflow-motion .workflow-connector", { scaleX: 0, transformOrigin: "left center" });
-        workflowTl.to(".workflow-motion .connector-1", { scaleX: 1, duration: .14 }, .2).to(workflowRings[0], { scale: 1, opacity: .42, duration: .12 }, .28).to(workflowDots[0], { opacity: 0, scale: .72, duration: .12 }, .28).to(workflowCards[0], { opacity: .22, scale: .96, duration: .11 }, .32).to(workflowCards[1], { opacity: 1, scale: 1.035, y: 0, duration: .15 }, .32).to(workflowRings[1], { scale: 1.12, opacity: 1, duration: .15 }, .34).to(workflowDots[1], { opacity: 1, scale: 1.2, duration: .12 }, .36).to(".workflow-motion .connector-2", { scaleX: 1, duration: .14 }, .51).to(workflowRings[1], { scale: 1, opacity: .42, duration: .12 }, .59).to(workflowDots[1], { opacity: 0, scale: .72, duration: .12 }, .59).to(workflowCards[1], { opacity: .22, scale: .96, duration: .11 }, .63).to(workflowCards[2], { opacity: 1, scale: 1.035, y: 0, duration: .15 }, .63).to(workflowRings[2], { scale: 1.12, opacity: 1, duration: .15 }, .65).to(workflowDots[2], { opacity: 1, scale: 1.2, duration: .12 }, .67).to(".workflow-motion .connector-3", { scaleX: 1, duration: .14 }, .82).to(workflowRings[2], { scale: 1, opacity: .42, duration: .12 }, .9).to(workflowDots[2], { opacity: 0, scale: .72, duration: .12 }, .9).to(workflowCards[2], { opacity: .22, scale: .96, duration: .11 }, .94).to(workflowCards[3], { opacity: 1, scale: 1.035, y: 0, duration: .15 }, .94).to(workflowRings[3], { scale: 1.12, opacity: 1, duration: .15 }, .96).to(workflowDots[3], { opacity: 1, scale: 1.2, duration: .12 }, .98).to(workflowCards, { opacity: 1, scale: 1, y: 0, duration: .18, stagger: .03 }, 1.22).to(workflowCards[3], { opacity: 1, duration: .08 }, 1.4).fromTo(".workflow-motion .workflow-complete", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: .16 }, 1.34).to(".workflow-motion .workflow-to-skills", { opacity: 1, scale: 1, duration: .18 }, 1.42);
-        pin(".workflow-motion", ".workflow-stage", workflowTl, true);
+        workflowTl.to(".workflow-motion .connector-1", { scaleX: 1, duration: .14 }, .2).to(workflowRings[0], { scale: 1, opacity: .42, duration: .12 }, .28).to(workflowDots[0], { opacity: 0, scale: .72, duration: .12 }, .28).to(workflowCards[0], { opacity: .22, scale: .96, duration: .11 }, .32).to(workflowCards[1], { opacity: 1, scale: 1.035, y: 0, duration: .15 }, .32).to(workflowRings[1], { scale: 1.12, opacity: 1, duration: .15 }, .34).to(workflowDots[1], { opacity: 1, scale: 1.2, duration: .12 }, .36).to(".workflow-motion .connector-2", { scaleX: 1, duration: .14 }, .51).to(workflowRings[1], { scale: 1, opacity: .42, duration: .12 }, .59).to(workflowDots[1], { opacity: 0, scale: .72, duration: .12 }, .59).to(workflowCards[1], { opacity: .22, scale: .96, duration: .11 }, .63).to(workflowCards[2], { opacity: 1, scale: 1.035, y: 0, duration: .15 }, .63).to(workflowRings[2], { scale: 1.12, opacity: 1, duration: .15 }, .65).to(workflowDots[2], { opacity: 1, scale: 1.2, duration: .12 }, .67).to(".workflow-motion .connector-3", { scaleX: 1, duration: .14 }, .82).to(workflowRings[2], { scale: 1, opacity: .42, duration: .12 }, .9).to(workflowDots[2], { opacity: 0, scale: .72, duration: .12 }, .9).to(workflowCards[2], { opacity: .22, scale: .96, duration: .11 }, .94).to(workflowCards[3], { opacity: 1, scale: 1.035, y: 0, duration: .15 }, .94).to(workflowRings[3], { scale: 1.12, opacity: 1, duration: .15 }, .96).to(workflowDots[3], { opacity: 1, scale: 1.2, duration: .12 }, .98).to(workflowCards, { opacity: 1, scale: 1, y: 0, duration: .18, stagger: .03 }, 1.22).to(workflowCards[3], { opacity: 1, duration: .08 }, 1.4).fromTo(".workflow-motion .workflow-complete", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: .16 }, 1.34).to(".workflow-motion .workflow-to-skills", { opacity: 1, scale: 1, duration: .18 }, 1.42).addLabel("workflow-complete");
+        pageTimelines.push(workflowTl);
+        pin(".workflow-motion", ".workflow-stage", workflowTl);
       }
 
       const skillPanels = gsap.utils.toArray<HTMLElement>(".skills-motion .skill-panel");
-      if (isMobile) {
+      if (profile.isMobile) {
         gsap.set(skillPanels, { opacity: 1, y: 0, scale: 1 });
       } else {
         const skillsTl = gsap.timeline();
         gsap.set(skillPanels, { opacity: 0, y: 25, scale: .92 });
         gsap.set(skillPanels[0], { opacity: 1, y: 0, scale: 1 });
         skillPanels.forEach((panel, index) => { const start = index / skillPanels.length; const others = skillPanels.filter((_, i) => i !== index); skillsTl.addLabel(`capability-${String(index + 1).padStart(2, "0")}`, start + .08).to(".skills-motion .skills-number", { textContent: String(index + 1).padStart(2, "0"), duration: .01 }, start).to(others, { opacity: 0, y: -15, scale: .92, duration: .04 }, start).to(panel, { opacity: 1, y: 0, scale: 1, duration: .09 }, start + .04).to(`.skills-motion .network-ring:nth-of-type(${(index % 3) + 1})`, { rotation: "+=55", scale: 1.12 + index * .03, duration: .16 }, start); });
-        skillsTl.addLabel("skills-complete", .9);
-        skillsTl.to(".skills-motion .skills-network", { scale: .58, x: 0, y: "-18vh", duration: .2 }, .88).to(".skills-motion .skills-heading", { opacity: 0, y: "-2vh", duration: .16 }, .88).to(".skills-motion .skills-to-works", { opacity: 1, y: 0, duration: .16 }, .92);
-        pin(".skills-motion", ".skills-stage", skillsTl, true);
+        skillsTl.to(".skills-motion .skills-network", { scale: .58, x: 0, y: "-18vh", duration: .2 }, .88).to(".skills-motion .skills-heading", { opacity: 0, y: "-2vh", duration: .16 }, .88).to(".skills-motion .skills-to-works", { opacity: 1, y: 0, duration: .16 }, .92).addLabel("skills-complete");
+        pageTimelines.push(skillsTl);
+        pin(".skills-motion", ".skills-stage", skillsTl);
       }
 
       const galleryCardsEls = gsap.utils.toArray<HTMLElement>("[data-gallery-card]");
       const supportCardsEls = galleryCardsEls.filter((element) => element.classList.contains("support-work-card"));
-      if (isMobile) {
+      if (profile.isMobile) {
         gsap.set(galleryCardsEls, { opacity: 1, visibility: "visible", clearProps: "transform" });
         gsap.set(".works-transition-motion .works-transition-heading", { opacity: 1 });
       } else {
@@ -323,13 +358,65 @@ export default function Home() {
         gsap.set(".works-transition-motion .works-seed", { opacity: 0, scale: .72 });
         galleryCards.forEach((card) => { const element = root.querySelector<HTMLElement>(`[data-gallery-card="${card.id}"]`); if (!element) return; const revealAt = .34 + card.enter * .6; gsap.set(element, { "--gx": card.sx, "--gy": card.sy, "--gz": card.sz, "--gs": card.ss, borderRadius: "18px" }); galleryTl.set(element, { visibility: "visible" }, revealAt).to(element, { opacity: card.role === "image" ? .74 : .88, "--gx": card.x, "--gy": card.y, "--gz": card.z, "--gr": card.r, "--gs": card.s, duration: .18, ease: "power2.out" }, revealAt); });
         galleryTl.to(".works-transition-motion .works-line:first-child", { y: "-19vh", x: "-2vw", opacity: .08, duration: .2, ease: "power3.inOut" }, .2).to(".works-transition-motion .works-line-strong", { y: "19vh", x: "2vw", opacity: .08, duration: .2, ease: "power3.inOut" }, .2).to(".works-transition-motion .works-transition-heading .eyebrow", { opacity: 0, duration: .12 }, .23).to(".works-transition-motion .works-seed", { opacity: .7, scale: 1.2, rotation: 90, duration: .18 }, .31).to(".works-transition-motion .gallery-camera", { x: "-2vw", y: "-2vh", scale: 1.06, duration: .26, ease: "power2.inOut" }, .62).to(supportCardsEls, { opacity: 0, visibility: "hidden", "--gz": -980, "--gs": .24, duration: .2, stagger: .015, ease: "power2.in" }, .72);
-        galleryCards.slice(0, 4).forEach((card, index) => { const element = root.querySelector<HTMLElement>(`[data-gallery-card="${card.id}"]`); if (!element) return; const finalScale = isTablet ? .74 : .82; const gapX = Math.min(32, window.innerWidth * .02); const gapY = Math.min(28, window.innerHeight * .035); const finalX = Math.sign(card.finalX) * ((element.offsetWidth * finalScale + gapX) / 2 / window.innerWidth * 100); const finalY = Math.sign(card.finalY) * ((element.offsetHeight * finalScale + gapY) / 2 / window.innerHeight * 100); galleryTl.to(element, { "--gx": finalX, "--gy": finalY, "--gz": 0, "--gr": 0, "--gs": finalScale, opacity: 1, borderRadius: "14px", duration: .24, ease: "power3.inOut" }, .78 + index * .035); });
-        galleryTl.to(".works-transition-motion .gallery-camera", { x: 0, y: 0, scale: 1, duration: .24, ease: "power2.inOut" }, .78).to(".works-transition-motion .works-transition-heading", { opacity: 0, duration: .16 }, .8).to(".works-transition-motion .works-transition-note, .works-transition-motion .works-transition-meta", { opacity: 0, duration: .1 }, .82);
-        pin(".works-transition-motion", ".works-transition-stage", galleryTl, true);
+        galleryCards.slice(0, 4).forEach((card, index) => {
+          const element = root.querySelector<HTMLElement>(`[data-gallery-card="${card.id}"]`);
+          if (!element) return;
+          const finalScale = profile.isTablet ? .74 : .82;
+          const finalX = () => Math.sign(card.finalX) * ((element.offsetWidth * finalScale + Math.min(32, window.innerWidth * .02)) / 2 / window.innerWidth * 100);
+          const finalY = () => Math.sign(card.finalY) * ((element.offsetHeight * finalScale + Math.min(28, window.innerHeight * .035)) / 2 / window.innerHeight * 100);
+          galleryTl.to(element, { "--gx": finalX, "--gy": finalY, "--gz": 0, "--gr": 0, "--gs": finalScale, opacity: 1, borderRadius: "14px", duration: .24, ease: "power3.inOut" }, .78 + index * .035);
+        });
+        galleryTl.to(".works-transition-motion .gallery-camera", { x: 0, y: 0, scale: 1, duration: .24, ease: "power2.inOut" }, .78).to(".works-transition-motion .works-transition-heading", { opacity: 0, duration: .16 }, .8).to(".works-transition-motion .works-transition-note, .works-transition-motion .works-transition-meta", { opacity: 0, duration: .1 }, .82).addLabel("works-complete");
+        pageTimelines.push(galleryTl);
+        pin(".works-transition-motion", ".works-transition-stage", galleryTl);
       }
-    }, root);
+
+      }, root);
+    };
+
+    const rebuildMotion = (profile: ViewportProfile) => {
+      if (disposed) return;
+      cleanupMotion();
+      activeProfile = profile;
+      buildMotion(activeProfile);
+      ScrollTrigger.refresh();
+    };
+
+    const scheduleRebuild = () => {
+      window.clearTimeout(rebuildTimer);
+      rebuildTimer = window.setTimeout(() => rebuildMotion(getViewportProfile()), 90);
+    };
+
+    buildMotion(activeProfile);
     ScrollTrigger.refresh();
-    return () => { window.clearTimeout(snapTimer); gsap.ticker.remove(raf); if (onUserWheel) { window.removeEventListener("wheel", onUserWheel); window.removeEventListener("touchstart", onUserWheel); } if (onLenisScroll) lenis.off("scroll", onLenisScroll); lenis.destroy(); ctx.revert(); responsive.revert(); };
+
+    const onResize = () => {
+      window.clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(() => {
+        const nextProfile = getViewportProfile();
+        if (nextProfile.width !== activeProfile.width || nextProfile.height !== activeProfile.height || nextProfile.pcTier !== activeProfile.pcTier || nextProfile.isMobile !== activeProfile.isMobile || nextProfile.isTablet !== activeProfile.isTablet) rebuildMotion(nextProfile);
+      }, 140);
+    };
+    window.addEventListener("resize", onResize);
+
+    const images = Array.from(root.querySelectorAll<HTMLImageElement>("img"));
+    const onImageLoad = () => scheduleRebuild();
+    images.filter((image) => !image.complete).forEach((image) => image.addEventListener("load", onImageLoad));
+    const onFontsReady = () => scheduleRebuild();
+    if (document.fonts && document.fonts.status !== "loaded") void document.fonts.ready.then(onFontsReady);
+
+    return () => {
+      disposed = true;
+      window.clearTimeout(resizeTimer);
+      window.clearTimeout(rebuildTimer);
+      window.removeEventListener("resize", onResize);
+      images.forEach((image) => image.removeEventListener("load", onImageLoad));
+      lenis.off("scroll", onLenisScroll);
+      gsap.ticker.remove(raf);
+      lenis.destroy();
+      cleanupMotion();
+      delete root.dataset.pcTier;
+    };
   }, []);
 
   return <main ref={rootRef} className="animated-portfolio"><Header /><ScrollProgress progress={progress} /><ScrollDial progress={progress} isScrolling={isScrolling} /><HeroSection /><AboutSection /><WorkflowSection /><SkillsSection /><WorksTransitionSection /><ContactSection /><footer className="site-footer"><span>Tsubasa&apos;s Portfolio</span><span>AI ENGINEER / PRODUCT BUILDER</span><span>© 2026 Tsubasa</span></footer></main>;
