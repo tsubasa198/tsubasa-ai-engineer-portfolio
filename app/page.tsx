@@ -48,6 +48,7 @@ type ViewportProfile = {
 function getViewportProfile(): ViewportProfile {
   const width = window.innerWidth;
   const height = window.innerHeight;
+  const isLandscapeMobile = width >= 768 && width <= 1023 && height <= 600;
   const isCompact = height <= 900 || (width >= 1280 && width <= 1439);
   const pcTier: PcTier = isCompact
     ? "compact"
@@ -60,8 +61,8 @@ function getViewportProfile(): ViewportProfile {
   return {
     width,
     height,
-    isMobile: width <= 767,
-    isTablet: width >= 768 && width <= 1023,
+    isMobile: width <= 767 || isLandscapeMobile,
+    isTablet: width >= 768 && width <= 1279 && !isLandscapeMobile,
     pcTier,
   };
 }
@@ -175,9 +176,61 @@ function AbstractCore({ className = "" }: { className?: string }) {
 }
 
 function HeroSection() {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const playAttemptsRef = useRef(0);
   const [videoEnabled, setVideoEnabled] = useState(false);
-  useEffect(() => { const media = window.matchMedia("(prefers-reduced-motion: reduce)"); const update = () => setVideoEnabled(!media.matches && window.innerWidth > 767); update(); media.addEventListener("change", update); window.addEventListener("resize", update); return () => { media.removeEventListener("change", update); window.removeEventListener("resize", update); }; }, []);
-  return <section id="hero" className="motion-stage-section hero-motion"><div className="motion-stage hero-stage"><video className="hero-video" autoPlay={videoEnabled} muted loop playsInline preload={videoEnabled ? "metadata" : "none"} poster="/assets/hero/0713-poster.jpg" tabIndex={-1} aria-hidden="true"><source src="/assets/hero/0713.mp4" type="video/mp4" /></video><div className="hero-video-overlay" aria-hidden="true" /><div className="hero-grid" aria-hidden="true" /><div className="hero-copy"><p className="eyebrow">AI ENGINEER / FDE</p><h1 aria-label="まだ言葉になっていない現場の課題を、AIで解決する。"><span className="hero-line" aria-hidden="true"><span>まだ言葉になっていない現場の課題を、</span></span><span className="hero-line hero-line-strong" aria-hidden="true"><span>AIで解決する。</span></span></h1></div><div className="hero-core-wrap"><AbstractCore className="hero-core" /><span className="hero-core-label">HUMAN / AI / PRODUCT</span></div><div className="hero-bridge-copy"><p className="eyebrow">THE STARTING POINT</p><p>問いをほどくと、<br /><strong>つくるべきものが見えてくる。</strong></p></div><div className="hero-footer-note"><span>SCROLL TO EXPLORE</span><i /></div><ScrollGuide /></div></section>;
+  const [videoSrc, setVideoSrc] = useState("/assets/hero/0713.mp4");
+  const [videoReady, setVideoReady] = useState(false);
+  useEffect(() => { const media = window.matchMedia("(prefers-reduced-motion: reduce)"); const update = () => { const touchLandscape = window.innerWidth <= 1023 && window.innerHeight <= 600; const touchHero = window.innerWidth <= 767 || touchLandscape; const useMobileVideo = touchHero; setVideoSrc(useMobileVideo ? "/assets/hero/0713-mobile.mp4" : "/assets/hero/0713.mp4"); setVideoEnabled(!media.matches && (window.innerWidth >= 1024 || touchHero)); }; update(); media.addEventListener("change", update); window.addEventListener("resize", update); return () => { media.removeEventListener("change", update); window.removeEventListener("resize", update); }; }, []);
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !videoEnabled) return;
+    video.defaultMuted = true;
+    video.muted = true;
+    video.playsInline = true;
+    video.load();
+  }, [videoEnabled, videoSrc]);
+  useEffect(() => {
+    playAttemptsRef.current = 0;
+    const video = videoRef.current;
+    if (!video || !videoEnabled) return;
+    let cancelled = false;
+    const tryPlay = (isRetry = false) => {
+      if (cancelled || playAttemptsRef.current >= (isRetry ? 2 : 1)) return;
+      playAttemptsRef.current += 1;
+      video.defaultMuted = true;
+      video.muted = true;
+      video.playsInline = true;
+      void video.play().then(() => {
+        if (!cancelled) setVideoReady(true);
+      }).catch(() => {
+        if (!cancelled) setVideoReady(false);
+      });
+    };
+    const retryAfterGesture = () => {
+      if (playAttemptsRef.current >= 2) return;
+      tryPlay(true);
+      window.removeEventListener("pointerdown", retryAfterGesture);
+    };
+    const playFromEvent = () => tryPlay();
+    const onPlaying = () => setVideoReady(true);
+    const onError = () => setVideoReady(false);
+    video.addEventListener("loadeddata", playFromEvent, { once: true });
+    video.addEventListener("canplay", playFromEvent, { once: true });
+    video.addEventListener("playing", onPlaying);
+    video.addEventListener("error", onError);
+    window.addEventListener("pointerdown", retryAfterGesture, { once: true, passive: true });
+    if (video.readyState >= 2) tryPlay();
+    return () => {
+      cancelled = true;
+      video.removeEventListener("loadeddata", playFromEvent);
+      video.removeEventListener("canplay", playFromEvent);
+      video.removeEventListener("playing", onPlaying);
+      video.removeEventListener("error", onError);
+      window.removeEventListener("pointerdown", retryAfterGesture);
+    };
+  }, [videoEnabled, videoSrc]);
+  return <section id="hero" className="motion-stage-section hero-motion"><div className="motion-stage hero-stage"><video ref={videoRef} className={`hero-video ${videoReady ? "is-ready" : ""}`} autoPlay={videoEnabled} muted loop playsInline preload={videoEnabled ? "auto" : "none"} poster="/assets/hero/0713-poster.jpg" tabIndex={-1} aria-hidden="true"><source src={videoSrc} type="video/mp4" /></video><div className="hero-video-overlay" aria-hidden="true" /><div className="hero-grid" aria-hidden="true" /><div className="hero-copy"><p className="eyebrow">AI ENGINEER / FDE</p><h1 aria-label="まだ言葉になっていない現場の課題を、AIで解決する。"><span className="hero-line" aria-hidden="true"><span>まだ言葉になっていない現場の課題を、</span></span><span className="hero-line hero-line-strong" aria-hidden="true"><span>AIで解決する。</span></span></h1></div><div className="hero-core-wrap"><AbstractCore className="hero-core" /><span className="hero-core-label">HUMAN / AI / PRODUCT</span></div><div className="hero-bridge-copy"><p className="eyebrow">THE STARTING POINT</p><p>問いをほどくと、<br /><strong>つくるべきものが見えてくる。</strong></p></div><div className="hero-footer-note"><span>SCROLL TO EXPLORE</span><i /></div><ScrollGuide /></div></section>;
 }
 
 function AboutSection() {
@@ -236,7 +289,11 @@ export default function Home() {
 
   useLayoutEffect(() => {
     const root = rootRef.current;
-    if (!root || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!root) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      root.dataset.motionMode = "reduced";
+      return () => { delete root.dataset.motionMode; };
+    }
     let disposed = false;
     let activeProfile = getViewportProfile();
     let resizeTimer = 0;
@@ -244,11 +301,13 @@ export default function Home() {
     let motionContext: gsap.Context | null = null;
     let pageTriggers: ScrollTrigger[] = [];
     let pageTimelines: gsap.core.Timeline[] = [];
-    const lenis = new Lenis({ lerp: activeProfile.isMobile ? .12 : .08, smoothWheel: !activeProfile.isMobile, syncTouch: activeProfile.isMobile });
-    const raf = (time: number) => { lenis.raf(time * 1000); };
-    gsap.ticker.add(raf);
+    const lenis = activeProfile.isMobile || activeProfile.isTablet
+      ? null
+      : new Lenis({ lerp: .08, smoothWheel: true, syncTouch: false });
+    const raf = (time: number) => { lenis?.raf(time * 1000); };
+    if (lenis) gsap.ticker.add(raf);
     const onLenisScroll = () => { ScrollTrigger.update(); };
-    lenis.on("scroll", onLenisScroll);
+    lenis?.on("scroll", onLenisScroll);
 
     const restoreMotionStyles = () => {
       const resetTargets = root.querySelectorAll<HTMLElement>([
@@ -279,6 +338,8 @@ export default function Home() {
 
     const buildMotion = (profile: ViewportProfile) => {
       root.dataset.pcTier = profile.pcTier;
+      root.dataset.motionMode = profile.isMobile ? "mobile" : profile.isTablet ? "tablet" : "pc";
+      if (profile.isMobile || profile.isTablet) return;
       motionContext = gsap.context(() => {
         const pin = (section: string, stage: string, animation: gsap.core.Timeline) => {
           const trigger = ScrollTrigger.create({ trigger: section, start: "top top", end: "bottom bottom", pin: stage, scrub: profile.isTablet ? .75 : .9, animation, invalidateOnRefresh: true });
@@ -389,7 +450,7 @@ export default function Home() {
       cleanupMotion();
       activeProfile = profile;
       buildMotion(activeProfile);
-      ScrollTrigger.refresh();
+      if (!profile.isMobile && !profile.isTablet) ScrollTrigger.refresh();
     };
 
     const scheduleRebuild = () => {
@@ -398,7 +459,7 @@ export default function Home() {
     };
 
     buildMotion(activeProfile);
-    ScrollTrigger.refresh();
+    if (!activeProfile.isMobile && !activeProfile.isTablet) ScrollTrigger.refresh();
 
     const onResize = () => {
       window.clearTimeout(resizeTimer);
@@ -421,11 +482,12 @@ export default function Home() {
       window.clearTimeout(rebuildTimer);
       window.removeEventListener("resize", onResize);
       images.forEach((image) => image.removeEventListener("load", onImageLoad));
-      lenis.off("scroll", onLenisScroll);
-      gsap.ticker.remove(raf);
-      lenis.destroy();
+      lenis?.off("scroll", onLenisScroll);
+      if (lenis) gsap.ticker.remove(raf);
+      lenis?.destroy();
       cleanupMotion();
       delete root.dataset.pcTier;
+      delete root.dataset.motionMode;
     };
   }, []);
 
