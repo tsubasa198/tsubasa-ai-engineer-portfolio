@@ -118,7 +118,7 @@ function AbstractCore({ className = "" }: { className?: string }) {
 
 function HeroSection() {
   const [videoEnabled, setVideoEnabled] = useState(false);
-  useEffect(() => { const media = window.matchMedia("(prefers-reduced-motion: reduce)"); const update = () => setVideoEnabled(!media.matches); update(); media.addEventListener("change", update); return () => media.removeEventListener("change", update); }, []);
+  useEffect(() => { const media = window.matchMedia("(prefers-reduced-motion: reduce)"); const update = () => setVideoEnabled(!media.matches && window.innerWidth > 767); update(); media.addEventListener("change", update); window.addEventListener("resize", update); return () => { media.removeEventListener("change", update); window.removeEventListener("resize", update); }; }, []);
   return <section id="hero" className="motion-stage-section hero-motion"><div className="motion-stage hero-stage"><video className="hero-video" autoPlay={videoEnabled} muted loop playsInline preload={videoEnabled ? "metadata" : "none"} poster="/assets/hero/0713-poster.jpg" tabIndex={-1} aria-hidden="true"><source src="/assets/hero/0713.mp4" type="video/mp4" /></video><div className="hero-video-overlay" aria-hidden="true" /><div className="hero-grid" aria-hidden="true" /><div className="hero-copy"><p className="eyebrow">AI ENGINEER / PRODUCT BUILDER</p><h1 aria-label="現場が本当に求めているものを、AIで形にする。"><span className="hero-line" aria-hidden="true"><span>現場が本当に求めて</span></span><span className="hero-line" aria-hidden="true"><span>いるものを、</span></span><span className="hero-line hero-line-strong" aria-hidden="true"><span>AIで形にする。</span></span></h1><p className="hero-lead">業務改善で終わらない。課題整理から設計、実装、導入、改善まで。人とAIの間に、使われ続ける仕組みをつくる。</p></div><div className="hero-core-wrap"><AbstractCore className="hero-core" /><span className="hero-core-label">HUMAN / AI / PRODUCT</span></div><div className="hero-bridge-copy"><p className="eyebrow">THE STARTING POINT</p><p>問いをほどくと、<br /><strong>つくるべきものが見えてくる。</strong></p></div><div className="hero-footer-note"><span>SCROLL TO EXPLORE</span><i /></div></div></section>;
 }
 
@@ -126,12 +126,29 @@ function AboutSection() {
   return <section id="about" className="motion-stage-section about-motion"><div className="motion-stage about-stage"><div className="about-grid" aria-hidden="true" /><div className="about-bridge-core"><AbstractCore className="bridge-core" /></div><div className="about-layout"><div className="about-visual"><div className="about-visual-line" /><span className="about-visual-caption">Tsubasa / AI Engineer</span></div><div className="about-copy"><p className="eyebrow">ABOUT TSUBASA</p><h2>技術の先にいる、<br /><strong>人を見る。</strong></h2><p>システムをつくる前に、そのシステムを使う人の一日を想像する。何に困り、どこで迷い、何が変わればもっと前に進めるのか。</p><p>業務分解から設計、実装、改善まで。AIを組み込むだけでなく、現場に届くプロダクトとして育てることを大切にしています。</p><div className="about-tags"><span>業務分解</span><span>ワークフロー設計</span><span>AIプロダクト開発</span><span>導入・改善</span></div></div></div><div className="about-to-workflow"><span>THE NEXT STEP</span><i /></div></div></section>;
 }
 
-function WorkflowCard({ step }: { step: (typeof workflowSteps)[number] }) {
-  return <article className={`workflow-card workflow-${step.accent}`} data-workflow-index={step.number}><div className="workflow-card-top"><span>{step.number}</span><i /></div><div className="workflow-graphic" aria-hidden="true"><span className="graphic-ring ring-one" /><span className="graphic-ring ring-two" /><span className="graphic-dot" /><span className="graphic-stem" /><span className="graphic-mini-dot dot-one" /><span className="graphic-mini-dot dot-two" /></div><div className="workflow-card-copy"><h3>{step.title}</h3><p>{step.description}</p></div><div className="workflow-accent" /></article>;
+function WorkflowCard({ step, active = false, cardRef }: { step: (typeof workflowSteps)[number]; active?: boolean; cardRef?: (node: HTMLElement | null) => void }) {
+  return <article ref={cardRef} className={`workflow-card workflow-${step.accent} ${active ? "is-active" : ""}`} data-workflow-index={step.number} aria-current={active ? "step" : undefined}><div className="workflow-card-top"><span>{step.number}</span><i /></div><div className="workflow-graphic" aria-hidden="true"><span className="graphic-ring ring-one" /><span className="graphic-ring ring-two" /><span className="graphic-dot" /><span className="graphic-stem" /><span className="graphic-mini-dot dot-one" /><span className="graphic-mini-dot dot-two" /></div><div className="workflow-card-copy"><h3>{step.title}</h3><p>{step.description}</p></div><div className="workflow-accent" /></article>;
 }
 
 function WorkflowSection() {
-  return <section id="workflow" className="motion-stage-section workflow-motion"><div className="motion-stage workflow-stage"><div className="workflow-grid" aria-hidden="true" /><div className="workflow-heading"><p className="eyebrow">HOW I WORK</p><h2>考え方から、<br /><strong>つくり方まで。</strong></h2><p className="workflow-support">課題を見つけ、流れをつくり、触れる形で試し、現場で育てる。</p></div><div className="workflow-track"><div className="workflow-track-line" aria-hidden="true" /><div className="workflow-connector connector-1" aria-hidden="true" /><div className="workflow-connector connector-2" aria-hidden="true" /><div className="workflow-connector connector-3" aria-hidden="true" /><div className="workflow-moving-dot" aria-hidden="true" />{workflowSteps.map((step) => <WorkflowCard key={step.number} step={step} />)}</div><p className="workflow-complete">課題整理から導入・改善まで、一貫して支援する。</p><div className="workflow-to-skills" aria-hidden="true"><span /><i /><b /></div></div></section>;
+  const [activeStep, setActiveStep] = useState("01");
+  const cardRefs = useRef<Record<string, HTMLElement | null>>({});
+
+  useEffect(() => {
+    if (!window.matchMedia("(max-width: 767px)").matches) return;
+    const observer = new IntersectionObserver((entries) => {
+      const visible = entries.filter((entry) => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+      const number = visible?.target.getAttribute("data-workflow-index");
+      if (number) setActiveStep(number);
+    }, { rootMargin: "-32% 0px -48% 0px", threshold: [0.2, 0.5, 0.8] });
+    workflowSteps.forEach((step) => {
+      const card = cardRefs.current[step.number];
+      if (card) observer.observe(card);
+    });
+    return () => observer.disconnect();
+  }, []);
+
+  return <section id="workflow" className="motion-stage-section workflow-motion"><div className="motion-stage workflow-stage"><div className="workflow-grid" aria-hidden="true" /><div className="workflow-heading"><p className="eyebrow">HOW I WORK</p><h2>考え方から、<br /><strong>つくり方まで。</strong></h2><p className="workflow-support">課題を見つけ、流れをつくり、触れる形で試し、現場で育てる。</p></div><div className="workflow-track"><div className="workflow-track-line" aria-hidden="true" /><div className="workflow-connector connector-1" aria-hidden="true" /><div className="workflow-connector connector-2" aria-hidden="true" /><div className="workflow-connector connector-3" aria-hidden="true" /><div className="workflow-moving-dot" aria-hidden="true" />{workflowSteps.map((step) => <WorkflowCard key={step.number} step={step} active={activeStep === step.number} cardRef={(node) => { cardRefs.current[step.number] = node; }} />)}</div><p className="workflow-complete">課題整理から導入・改善まで、一貫して支援する。</p><div className="workflow-to-skills" aria-hidden="true"><span /><i /><b /></div></div></section>;
 }
 
 function SkillsSection() {
@@ -145,7 +162,7 @@ function WorksTransitionSection() {
 function GalleryCard({ card }: { card: (typeof galleryCards)[number] }) {
   const project = projects.find((item) => item.id === card.projectId) ?? projects[0];
   const isMajor = Number(card.id.slice(1)) <= 4;
-  return <Link href={`/works/${project.slug}`} className={`gallery-card gallery-role-${card.role} ${isMajor ? "major-work-card" : "support-work-card"}`} data-gallery-card={card.id} data-featured={card.id === featuredCardId ? "true" : undefined} style={{ "--gx": card.x, "--gy": card.y, "--gz": card.z, "--gr": card.r, "--gs": card.s } as CSSProperties} aria-label={`${project.title}の詳細を見る`}><div className="gallery-card-image"><Image src={project.image} alt={`${project.title}のサムネイル`} width={1672} height={941} unoptimized /></div><div className="gallery-card-info"><span>{project.category}</span><strong>{project.title}</strong><small>{project.stack}</small><span className="gallery-card-link-label">詳しく見る ↗</span></div></Link>;
+  return <Link href={`/works/${project.slug}`} className={`gallery-card gallery-role-${card.role} ${isMajor ? "major-work-card" : "support-work-card"}`} data-gallery-card={card.id} data-featured={card.id === featuredCardId ? "true" : undefined} style={{ "--gx": card.x, "--gy": card.y, "--gz": card.z, "--gr": card.r, "--gs": card.s } as CSSProperties} aria-label={`${project.title}の詳細を見る`}><div className="gallery-card-image"><Image src={project.image} alt={`${project.title}のサムネイル`} width={1672} height={941} sizes="(max-width: 767px) 100vw, (max-width: 1023px) 44vw, 44vw" unoptimized /></div><div className="gallery-card-info"><span>{project.category}</span><strong>{project.title}</strong><small>{project.stack}</small><span className="gallery-card-link-label">詳しく見る ↗</span></div></Link>;
 }
 
 function ContactSection() {
@@ -162,17 +179,23 @@ export default function Home() {
   useLayoutEffect(() => {
     const root = rootRef.current;
     if (!root || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const isMobile = window.matchMedia("(max-width: 560px)").matches;
-    const lenis = new Lenis({ lerp: .08, smoothWheel: true, syncTouch: false });
+    const responsive = gsap.matchMedia();
+    let isMobile = false;
+    let isTablet = false;
+    responsive.add({ mobile: "(max-width: 767px)", tablet: "(min-width: 768px) and (max-width: 1023px)", desktop: "(min-width: 1024px)" }, ({ conditions }) => {
+      isMobile = Boolean(conditions?.mobile);
+      isTablet = Boolean(conditions?.tablet);
+    });
+    const lenis = new Lenis({ lerp: isMobile ? .12 : .08, smoothWheel: !isMobile, syncTouch: isMobile });
     const raf = (time: number) => { lenis.raf(time * 1000); };
     gsap.ticker.add(raf);
     let snapTimer = 0;
     let onUserWheel: (() => void) | undefined;
     let onLenisScroll: (() => void) | undefined;
     const ctx = gsap.context(() => {
-      const snap = { snapTo: "labelsDirectional" as const, delay: isMobile ? .16 : .12, duration: { min: isMobile ? .18 : .25, max: isMobile ? .4 : .65 }, ease: "power2.inOut", inertia: false };
+      const snap = { snapTo: "labelsDirectional" as const, delay: isTablet ? .18 : .12, duration: { min: isTablet ? .2 : .25, max: isTablet ? .5 : .65 }, ease: "power2.inOut", inertia: false };
       const snapTriggers: ReturnType<typeof ScrollTrigger.create>[] = [];
-      const pin = (section: string, stage: string, animation: gsap.core.Timeline, snapEnabled = false) => { const trigger = ScrollTrigger.create({ trigger: section, start: "top top", end: "bottom bottom", pin: stage, scrub: isMobile ? .65 : .9, animation, ...(snapEnabled ? { snap } : {}), invalidateOnRefresh: true }); if (snapEnabled) snapTriggers.push(trigger); return trigger; };
+      const pin = (section: string, stage: string, animation: gsap.core.Timeline, snapEnabled = false) => { const trigger = ScrollTrigger.create({ trigger: section, start: "top top", end: "bottom bottom", pin: stage, scrub: isTablet ? .75 : .9, animation, ...(!isMobile && snapEnabled ? { snap } : {}), invalidateOnRefresh: true }); if (!isMobile && snapEnabled) snapTriggers.push(trigger); return trigger; };
       let hasUserScrolled = false;
       let isLenisSnapping = false;
       let lastObservedScroll = window.scrollY;
@@ -204,56 +227,82 @@ export default function Home() {
       window.addEventListener("wheel", onUserWheel, { passive: true });
       window.addEventListener("touchstart", onUserWheel, { passive: true });
 
-      gsap.set(".hero-motion .hero-copy", { opacity: 0, y: 24 });
-      gsap.set(".hero-motion .hero-copy .eyebrow, .hero-motion .hero-copy .hero-lead", { opacity: 0, y: 15 });
-      gsap.set(".hero-motion .hero-copy .hero-line > span", { opacity: 0, y: "105%" });
-      gsap.set(".hero-motion .hero-core-wrap", { opacity: .08, scale: .88 });
-      const hero = gsap.timeline().addLabel("video", 0).to(".hero-motion .hero-video-overlay", { opacity: .52, duration: .2 }, .2).addLabel("label-visible", .3).to(".hero-motion .hero-copy", { opacity: 1, y: 0, duration: .01 }, .29).to(".hero-motion .hero-copy .eyebrow", { opacity: 1, y: 0, letterSpacing: ".22em", duration: .14 }, .3).to(".hero-motion .hero-copy .hero-line > span", { opacity: 1, y: "0%", duration: .18, stagger: .08, ease: "power3.out" }, .38).addLabel("headline-visible", .74).to(".hero-motion .hero-copy .hero-lead", { opacity: 1, y: 0, duration: .17 }, .58).addLabel("hero-complete", .82).to(".hero-motion .hero-core-wrap", { opacity: 1, scale: 1, duration: .35 }, .64).to(".hero-motion .hero-core", { x: "-18vw", y: "8vh", scale: .75, duration: .55 }, .72).to(".hero-motion .core-orbit", { rotation: "+=55", scale: 1.18, stagger: .05, duration: .55 }, .72).addLabel("hero-exit", .9).to(".hero-motion .hero-copy", { x: "-8vw", opacity: 0, duration: .2 }, .9).fromTo(".hero-motion .hero-bridge-copy", { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: .18 }, .94);
-      pin(".hero-motion", ".hero-stage", hero, true);
+      if (isMobile) {
+        gsap.set(".hero-motion .hero-copy", { opacity: 1, y: 0 });
+        gsap.set(".hero-motion .hero-copy .eyebrow, .hero-motion .hero-copy .hero-lead, .hero-motion .hero-copy .hero-line > span", { opacity: 1, y: 0 });
+        gsap.set(".hero-motion .hero-core-wrap", { opacity: .72, scale: .84 });
+      } else {
+        gsap.set(".hero-motion .hero-copy", { opacity: 0, y: 24 });
+        gsap.set(".hero-motion .hero-copy .eyebrow, .hero-motion .hero-copy .hero-lead", { opacity: 0, y: 15 });
+        gsap.set(".hero-motion .hero-copy .hero-line > span", { opacity: 0, y: "105%" });
+        gsap.set(".hero-motion .hero-core-wrap", { opacity: .08, scale: .88 });
+        const hero = gsap.timeline().addLabel("video", 0).to(".hero-motion .hero-video-overlay", { opacity: .52, duration: .2 }, .2).addLabel("label-visible", .3).to(".hero-motion .hero-copy", { opacity: 1, y: 0, duration: .01 }, .29).to(".hero-motion .hero-copy .eyebrow", { opacity: 1, y: 0, letterSpacing: ".22em", duration: .14 }, .3).to(".hero-motion .hero-copy .hero-line > span", { opacity: 1, y: "0%", duration: .18, stagger: .08, ease: "power3.out" }, .38).addLabel("headline-visible", .74).to(".hero-motion .hero-copy .hero-lead", { opacity: 1, y: 0, duration: .17 }, .58).addLabel("hero-complete", .82).to(".hero-motion .hero-core-wrap", { opacity: 1, scale: 1, duration: .35 }, .64).to(".hero-motion .hero-core", { x: "-18vw", y: "8vh", scale: .75, duration: .55 }, .72).to(".hero-motion .core-orbit", { rotation: "+=55", scale: 1.18, stagger: .05, duration: .55 }, .72).addLabel("hero-exit", .9).to(".hero-motion .hero-copy", { x: "-8vw", opacity: 0, duration: .2 }, .9).fromTo(".hero-motion .hero-bridge-copy", { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: .18 }, .94);
+        pin(".hero-motion", ".hero-stage", hero, true);
+      }
 
-      const about = gsap.timeline().to(".about-motion .bridge-core", { x: "-12vw", y: "-8vh", scale: .72, duration: .35 }, 0).to(".about-motion .bridge-core .core-orbit", { rotation: "+=70", stagger: .06, duration: .5 }, 0).fromTo(".about-motion .about-copy", { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: .25 }, .22).fromTo(".about-motion .about-visual-line", { scaleY: 0 }, { scaleY: 1, duration: .2 }, .42).to(".about-motion .bridge-core .node-a", { x: "-10vw", y: "-7vh", duration: .22 }, .45).to(".about-motion .bridge-core .node-b", { x: "10vw", y: "7vh", duration: .22 }, .45);
-      pin(".about-motion", ".about-stage", about);
+      if (isMobile) {
+        gsap.set(".about-motion .about-copy", { opacity: 1, y: 0 });
+        gsap.set(".about-motion .about-visual-line", { scaleY: 1 });
+      } else {
+        const about = gsap.timeline().to(".about-motion .bridge-core", { x: "-12vw", y: "-8vh", scale: .72, duration: .35 }, 0).to(".about-motion .bridge-core .core-orbit", { rotation: "+=70", stagger: .06, duration: .5 }, 0).fromTo(".about-motion .about-copy", { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: .25 }, .22).fromTo(".about-motion .about-visual-line", { scaleY: 0 }, { scaleY: 1, duration: .2 }, .42).to(".about-motion .bridge-core .node-a", { x: "-10vw", y: "-7vh", duration: .22 }, .45).to(".about-motion .bridge-core .node-b", { x: "10vw", y: "7vh", duration: .22 }, .45);
+        pin(".about-motion", ".about-stage", about);
+      }
 
       const workflowCards = gsap.utils.toArray<HTMLElement>(".workflow-motion .workflow-card");
       const workflowRings = workflowCards.map((card) => gsap.utils.toArray<HTMLElement>(".graphic-ring", card));
       const workflowDots = workflowCards.map((card) => card.querySelector<HTMLElement>(".graphic-dot"));
-      const workflowTl = gsap.timeline();
-      workflowTl.addLabel("step-01", .1).addLabel("step-02", .38).addLabel("step-03", .69).addLabel("step-04", 1.02).addLabel("workflow-complete", 1.36);
-      gsap.set(workflowCards, { opacity: isMobile ? 0 : .2, scale: .94, y: 18 });
-      gsap.set(workflowCards[0], { opacity: 1, scale: 1.035, y: 0 });
-      gsap.set(workflowRings.flat(), { scale: .96, opacity: .42, transformOrigin: "center center" });
-      gsap.set(workflowDots.filter(Boolean), { opacity: 0, scale: .72, transformOrigin: "center center" });
-      gsap.set(workflowRings[0], { scale: 1.12, opacity: 1 });
-      gsap.set(workflowDots[0], { opacity: 1, scale: 1.2 });
-      gsap.set(".workflow-motion .workflow-connector", { scaleX: 0, transformOrigin: "left center" });
-      workflowTl.to(".workflow-motion .connector-1", { scaleX: 1, duration: .14 }, .2).to(workflowRings[0], { scale: 1, opacity: .42, duration: .12 }, .28).to(workflowDots[0], { opacity: 0, scale: .72, duration: .12 }, .28).to(workflowCards[0], { opacity: isMobile ? 0 : .22, scale: .96, duration: .11 }, .32).to(workflowCards[1], { opacity: 1, scale: 1.035, y: 0, duration: .15 }, .32).to(workflowRings[1], { scale: 1.12, opacity: 1, duration: .15 }, .34).to(workflowDots[1], { opacity: 1, scale: 1.2, duration: .12 }, .36).to(".workflow-motion .connector-2", { scaleX: 1, duration: .14 }, .51).to(workflowRings[1], { scale: 1, opacity: .42, duration: .12 }, .59).to(workflowDots[1], { opacity: 0, scale: .72, duration: .12 }, .59).to(workflowCards[1], { opacity: isMobile ? 0 : .22, scale: .96, duration: .11 }, .63).to(workflowCards[2], { opacity: 1, scale: 1.035, y: 0, duration: .15 }, .63).to(workflowRings[2], { scale: 1.12, opacity: 1, duration: .15 }, .65).to(workflowDots[2], { opacity: 1, scale: 1.2, duration: .12 }, .67).to(".workflow-motion .connector-3", { scaleX: 1, duration: .14 }, .82).to(workflowRings[2], { scale: 1, opacity: .42, duration: .12 }, .9).to(workflowDots[2], { opacity: 0, scale: .72, duration: .12 }, .9).to(workflowCards[2], { opacity: isMobile ? 0 : .22, scale: .96, duration: .11 }, .94).to(workflowCards[3], { opacity: 1, scale: 1.035, y: 0, duration: .15 }, .94).to(workflowRings[3], { scale: 1.12, opacity: 1, duration: .15 }, .96).to(workflowDots[3], { opacity: 1, scale: 1.2, duration: .12 }, .98).to(workflowCards, { opacity: isMobile ? 0 : 1, scale: 1, y: 0, duration: .18, stagger: .03 }, 1.22).to(workflowCards[3], { opacity: 1, duration: .08 }, 1.4).fromTo(".workflow-motion .workflow-complete", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: .16 }, 1.34).to(".workflow-motion .workflow-to-skills", { opacity: 1, scale: 1, duration: .18 }, 1.42);
-      pin(".workflow-motion", ".workflow-stage", workflowTl, true);
+      if (isMobile) {
+        gsap.set(workflowCards, { opacity: 1, scale: 1, y: 0 });
+        gsap.set(workflowRings.flat(), { scale: 1, opacity: 1, transformOrigin: "center center" });
+        gsap.set(workflowDots.filter(Boolean), { opacity: 1, scale: 1, transformOrigin: "center center" });
+      } else {
+        const workflowTl = gsap.timeline();
+        workflowTl.addLabel("step-01", .1).addLabel("step-02", .38).addLabel("step-03", .69).addLabel("step-04", 1.02).addLabel("workflow-complete", 1.36);
+        gsap.set(workflowCards, { opacity: .2, scale: .94, y: 18 });
+        gsap.set(workflowCards[0], { opacity: 1, scale: 1.035, y: 0 });
+        gsap.set(workflowRings.flat(), { scale: .96, opacity: .42, transformOrigin: "center center" });
+        gsap.set(workflowDots.filter(Boolean), { opacity: 0, scale: .72, transformOrigin: "center center" });
+        gsap.set(workflowRings[0], { scale: 1.12, opacity: 1 });
+        gsap.set(workflowDots[0], { opacity: 1, scale: 1.2 });
+        gsap.set(".workflow-motion .workflow-connector", { scaleX: 0, transformOrigin: "left center" });
+        workflowTl.to(".workflow-motion .connector-1", { scaleX: 1, duration: .14 }, .2).to(workflowRings[0], { scale: 1, opacity: .42, duration: .12 }, .28).to(workflowDots[0], { opacity: 0, scale: .72, duration: .12 }, .28).to(workflowCards[0], { opacity: .22, scale: .96, duration: .11 }, .32).to(workflowCards[1], { opacity: 1, scale: 1.035, y: 0, duration: .15 }, .32).to(workflowRings[1], { scale: 1.12, opacity: 1, duration: .15 }, .34).to(workflowDots[1], { opacity: 1, scale: 1.2, duration: .12 }, .36).to(".workflow-motion .connector-2", { scaleX: 1, duration: .14 }, .51).to(workflowRings[1], { scale: 1, opacity: .42, duration: .12 }, .59).to(workflowDots[1], { opacity: 0, scale: .72, duration: .12 }, .59).to(workflowCards[1], { opacity: .22, scale: .96, duration: .11 }, .63).to(workflowCards[2], { opacity: 1, scale: 1.035, y: 0, duration: .15 }, .63).to(workflowRings[2], { scale: 1.12, opacity: 1, duration: .15 }, .65).to(workflowDots[2], { opacity: 1, scale: 1.2, duration: .12 }, .67).to(".workflow-motion .connector-3", { scaleX: 1, duration: .14 }, .82).to(workflowRings[2], { scale: 1, opacity: .42, duration: .12 }, .9).to(workflowDots[2], { opacity: 0, scale: .72, duration: .12 }, .9).to(workflowCards[2], { opacity: .22, scale: .96, duration: .11 }, .94).to(workflowCards[3], { opacity: 1, scale: 1.035, y: 0, duration: .15 }, .94).to(workflowRings[3], { scale: 1.12, opacity: 1, duration: .15 }, .96).to(workflowDots[3], { opacity: 1, scale: 1.2, duration: .12 }, .98).to(workflowCards, { opacity: 1, scale: 1, y: 0, duration: .18, stagger: .03 }, 1.22).to(workflowCards[3], { opacity: 1, duration: .08 }, 1.4).fromTo(".workflow-motion .workflow-complete", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: .16 }, 1.34).to(".workflow-motion .workflow-to-skills", { opacity: 1, scale: 1, duration: .18 }, 1.42);
+        pin(".workflow-motion", ".workflow-stage", workflowTl, true);
+      }
 
       const skillPanels = gsap.utils.toArray<HTMLElement>(".skills-motion .skill-panel");
-      const skillsTl = gsap.timeline();
-      gsap.set(skillPanels, { opacity: 0, y: 25, scale: .92 });
-      gsap.set(skillPanels[0], { opacity: 1, y: 0, scale: 1 });
-      skillPanels.forEach((panel, index) => { const start = index / skillPanels.length; const others = skillPanels.filter((_, i) => i !== index); skillsTl.addLabel(`capability-${String(index + 1).padStart(2, "0")}`, start + .08).to(".skills-motion .skills-number", { textContent: String(index + 1).padStart(2, "0"), duration: .01 }, start).to(others, { opacity: 0, y: -15, scale: .92, duration: .04 }, start).to(panel, { opacity: 1, y: 0, scale: 1, duration: .09 }, start + .04).to(`.skills-motion .network-ring:nth-of-type(${(index % 3) + 1})`, { rotation: "+=55", scale: 1.12 + index * .03, duration: .16 }, start); });
-      skillsTl.addLabel("skills-complete", .9);
-      skillsTl.to(".skills-motion .skills-network", { scale: .58, x: 0, y: "-18vh", duration: .2 }, .88).to(".skills-motion .skills-heading", { opacity: 0, y: "-2vh", duration: .16 }, .88).to(".skills-motion .skills-to-works", { opacity: 1, y: 0, duration: .16 }, .92);
-      pin(".skills-motion", ".skills-stage", skillsTl, true);
+      if (isMobile) {
+        gsap.set(skillPanels, { opacity: 1, y: 0, scale: 1 });
+      } else {
+        const skillsTl = gsap.timeline();
+        gsap.set(skillPanels, { opacity: 0, y: 25, scale: .92 });
+        gsap.set(skillPanels[0], { opacity: 1, y: 0, scale: 1 });
+        skillPanels.forEach((panel, index) => { const start = index / skillPanels.length; const others = skillPanels.filter((_, i) => i !== index); skillsTl.addLabel(`capability-${String(index + 1).padStart(2, "0")}`, start + .08).to(".skills-motion .skills-number", { textContent: String(index + 1).padStart(2, "0"), duration: .01 }, start).to(others, { opacity: 0, y: -15, scale: .92, duration: .04 }, start).to(panel, { opacity: 1, y: 0, scale: 1, duration: .09 }, start + .04).to(`.skills-motion .network-ring:nth-of-type(${(index % 3) + 1})`, { rotation: "+=55", scale: 1.12 + index * .03, duration: .16 }, start); });
+        skillsTl.addLabel("skills-complete", .9);
+        skillsTl.to(".skills-motion .skills-network", { scale: .58, x: 0, y: "-18vh", duration: .2 }, .88).to(".skills-motion .skills-heading", { opacity: 0, y: "-2vh", duration: .16 }, .88).to(".skills-motion .skills-to-works", { opacity: 1, y: 0, duration: .16 }, .92);
+        pin(".skills-motion", ".skills-stage", skillsTl, true);
+      }
 
       const galleryCardsEls = gsap.utils.toArray<HTMLElement>("[data-gallery-card]");
       const supportCardsEls = galleryCardsEls.filter((element) => element.classList.contains("support-work-card"));
-      const galleryTl = gsap.timeline();
-      galleryTl.addLabel("works-heading", 0).addLabel("heading-split", .2).addLabel("projects-appear", .34).addLabel("projects-spread", .62).addLabel("projects-aligned", .8);
-      gsap.set(galleryCardsEls, { opacity: 0, visibility: "hidden" });
-      gsap.set(".works-transition-motion .works-line", { opacity: 1, y: 0 });
-      gsap.set(".works-transition-motion .works-transition-heading", { opacity: 1 });
-      gsap.set(".works-transition-motion .works-seed", { opacity: 0, scale: .72 });
-      galleryCards.forEach((card) => { const element = root.querySelector(`[data-gallery-card="${card.id}"]`); if (!element) return; const revealAt = .34 + card.enter * .6; gsap.set(element, { "--gx": card.sx, "--gy": card.sy, "--gz": card.sz, "--gs": card.ss, borderRadius: "18px" }); galleryTl.set(element, { visibility: "visible" }, revealAt).to(element, { opacity: card.role === "image" ? .74 : .88, "--gx": card.x, "--gy": card.y, "--gz": card.z, "--gr": card.r, "--gs": card.s, duration: .18, ease: "power2.out" }, revealAt); });
-      galleryTl.to(".works-transition-motion .works-line:first-child", { y: "-19vh", x: "-2vw", opacity: .08, duration: .2, ease: "power3.inOut" }, .2).to(".works-transition-motion .works-line-strong", { y: "19vh", x: "2vw", opacity: .08, duration: .2, ease: "power3.inOut" }, .2).to(".works-transition-motion .works-transition-heading .eyebrow", { opacity: 0, duration: .12 }, .23).to(".works-transition-motion .works-seed", { opacity: .7, scale: 1.2, rotation: 90, duration: .18 }, .31).to(".works-transition-motion .gallery-camera", { x: "-2vw", y: "-2vh", scale: 1.06, duration: .26, ease: "power2.inOut" }, .62).to(supportCardsEls, { opacity: 0, visibility: "hidden", "--gz": -980, "--gs": .24, duration: .2, stagger: .015, ease: "power2.in" }, .72);
-      galleryCards.slice(0, 4).forEach((card, index) => { const element = root.querySelector(`[data-gallery-card="${card.id}"]`); if (!element) return; const finalScale = window.innerWidth <= 560 ? .56 : window.innerWidth <= 900 ? .72 : .82; const gapX = Math.min(32, window.innerWidth * .02); const gapY = Math.min(28, window.innerHeight * .035); const finalX = Math.sign(card.finalX) * ((element.offsetWidth * finalScale + gapX) / 2 / window.innerWidth * 100); const finalY = Math.sign(card.finalY) * ((element.offsetHeight * finalScale + gapY) / 2 / window.innerHeight * 100); galleryTl.to(element, { "--gx": finalX, "--gy": finalY, "--gz": 0, "--gr": 0, "--gs": finalScale, opacity: 1, borderRadius: "14px", duration: .24, ease: "power3.inOut" }, .78 + index * .035); });
-      galleryTl.to(".works-transition-motion .gallery-camera", { x: 0, y: 0, scale: 1, duration: .24, ease: "power2.inOut" }, .78).to(".works-transition-motion .works-transition-heading", { opacity: 0, duration: .16 }, .8).to(".works-transition-motion .works-transition-note, .works-transition-motion .works-transition-meta", { opacity: 0, duration: .1 }, .82);
-      pin(".works-transition-motion", ".works-transition-stage", galleryTl, true);
+      if (isMobile) {
+        gsap.set(galleryCardsEls, { opacity: 1, visibility: "visible", clearProps: "transform" });
+        gsap.set(".works-transition-motion .works-transition-heading", { opacity: 1 });
+      } else {
+        const galleryTl = gsap.timeline();
+        galleryTl.addLabel("works-heading", 0).addLabel("heading-split", .2).addLabel("projects-appear", .34).addLabel("projects-spread", .62).addLabel("projects-aligned", .8);
+        gsap.set(galleryCardsEls, { opacity: 0, visibility: "hidden" });
+        gsap.set(".works-transition-motion .works-line", { opacity: 1, y: 0 });
+        gsap.set(".works-transition-motion .works-transition-heading", { opacity: 1 });
+        gsap.set(".works-transition-motion .works-seed", { opacity: 0, scale: .72 });
+        galleryCards.forEach((card) => { const element = root.querySelector(`[data-gallery-card="${card.id}"]`); if (!element) return; const revealAt = .34 + card.enter * .6; gsap.set(element, { "--gx": card.sx, "--gy": card.sy, "--gz": card.sz, "--gs": card.ss, borderRadius: "18px" }); galleryTl.set(element, { visibility: "visible" }, revealAt).to(element, { opacity: card.role === "image" ? .74 : .88, "--gx": card.x, "--gy": card.y, "--gz": card.z, "--gr": card.r, "--gs": card.s, duration: .18, ease: "power2.out" }, revealAt); });
+        galleryTl.to(".works-transition-motion .works-line:first-child", { y: "-19vh", x: "-2vw", opacity: .08, duration: .2, ease: "power3.inOut" }, .2).to(".works-transition-motion .works-line-strong", { y: "19vh", x: "2vw", opacity: .08, duration: .2, ease: "power3.inOut" }, .2).to(".works-transition-motion .works-transition-heading .eyebrow", { opacity: 0, duration: .12 }, .23).to(".works-transition-motion .works-seed", { opacity: .7, scale: 1.2, rotation: 90, duration: .18 }, .31).to(".works-transition-motion .gallery-camera", { x: "-2vw", y: "-2vh", scale: 1.06, duration: .26, ease: "power2.inOut" }, .62).to(supportCardsEls, { opacity: 0, visibility: "hidden", "--gz": -980, "--gs": .24, duration: .2, stagger: .015, ease: "power2.in" }, .72);
+        galleryCards.slice(0, 4).forEach((card, index) => { const element = root.querySelector(`[data-gallery-card="${card.id}"]`); if (!element) return; const finalScale = isTablet ? .74 : .82; const gapX = Math.min(32, window.innerWidth * .02); const gapY = Math.min(28, window.innerHeight * .035); const finalX = Math.sign(card.finalX) * ((element.offsetWidth * finalScale + gapX) / 2 / window.innerWidth * 100); const finalY = Math.sign(card.finalY) * ((element.offsetHeight * finalScale + gapY) / 2 / window.innerHeight * 100); galleryTl.to(element, { "--gx": finalX, "--gy": finalY, "--gz": 0, "--gr": 0, "--gs": finalScale, opacity: 1, borderRadius: "14px", duration: .24, ease: "power3.inOut" }, .78 + index * .035); });
+        galleryTl.to(".works-transition-motion .gallery-camera", { x: 0, y: 0, scale: 1, duration: .24, ease: "power2.inOut" }, .78).to(".works-transition-motion .works-transition-heading", { opacity: 0, duration: .16 }, .8).to(".works-transition-motion .works-transition-note, .works-transition-motion .works-transition-meta", { opacity: 0, duration: .1 }, .82);
+        pin(".works-transition-motion", ".works-transition-stage", galleryTl, true);
+      }
     }, root);
     ScrollTrigger.refresh();
-    return () => { window.clearTimeout(snapTimer); gsap.ticker.remove(raf); if (onUserWheel) { window.removeEventListener("wheel", onUserWheel); window.removeEventListener("touchstart", onUserWheel); } if (onLenisScroll) lenis.off("scroll", onLenisScroll); lenis.destroy(); ctx.revert(); };
+    return () => { window.clearTimeout(snapTimer); gsap.ticker.remove(raf); if (onUserWheel) { window.removeEventListener("wheel", onUserWheel); window.removeEventListener("touchstart", onUserWheel); } if (onLenisScroll) lenis.off("scroll", onLenisScroll); lenis.destroy(); ctx.revert(); responsive.revert(); };
   }, []);
 
   return <main ref={rootRef} className="animated-portfolio"><Header /><ScrollProgress progress={progress} /><ScrollDial progress={progress} isScrolling={isScrolling} /><HeroSection /><AboutSection /><WorkflowSection /><SkillsSection /><WorksTransitionSection /><ContactSection /><footer className="site-footer"><span>Tsubasa&apos;s Portfolio</span><span>AI ENGINEER / PRODUCT BUILDER</span><span>© 2026 Tsubasa</span></footer></main>;

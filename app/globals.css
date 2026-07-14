@@ -522,6 +522,156 @@ h1, h2, h3, h4, strong, .brand-mark span, .menu-panel > a { font-weight: 700; }
   .hero-motion, .about-motion, .workflow-motion, .skills-motion, .works-transition-motion { height: auto !important; }
 }
 
+/* Responsive system: keep the desktop composition, change the stage on smaller screens. */
+html, body { overflow-x: hidden; }
+img, video { max-width: 100%; }
+
+@media (min-width: 561px) and (max-width: 1023px) {
+  .site-header { padding: 22px clamp(22px, 4vw, 42px); }
+  .hero-stage { min-height: 100svh; padding: 22vh 8vw 10vh; }
+  .hero-stage .hero-copy { max-width: min(60vw, 620px); }
+  .hero-stage .hero-copy h1 { font-size: clamp(42px, 6.7vw, 72px); }
+  .hero-video { object-position: 57% 50%; }
+  .hero-core-wrap { top: 39vh; right: -5vw; width: 58vw; height: 49vh; opacity: .74; }
+  .hero-bridge-copy { right: 7vw; bottom: 10vh; }
+  .about-stage { min-height: 100svh; padding: 0 8vw; }
+  .about-layout { gap: 5vw; padding-top: 8vh; }
+  .about-visual { min-height: 330px; }
+  .about-copy h2 { font-size: clamp(42px, 6vw, 64px); }
+  .workflow-stage { padding-inline: 5vw; }
+  .workflow-heading { width: min(720px, 88vw); }
+  .workflow-heading h2 { font-size: clamp(42px, 6vw, 68px); }
+  .workflow-track { left: 5vw; right: 5vw; top: 39vh; height: 49vh; gap: 12px; }
+  .workflow-card { padding-inline: clamp(16px, 2vw, 24px); }
+  .workflow-card-copy h3 { font-size: clamp(17px, 2.2vw, 23px); }
+  .workflow-card-copy p { font-size: clamp(11px, 1.25vw, 13px); }
+  .skills-heading { top: 12vh; width: 80vw; }
+  .skills-network { width: min(54vw, 510px); height: min(54vw, 510px); }
+  .skills-panels { bottom: 9vh; width: min(68vw, 520px); }
+  .works-transition-heading { width: 82vw; }
+  .works-transition-heading h2 { font-size: clamp(44px, 6.2vw, 76px); }
+  .works-transition-stage .gallery-card.major-work-card { width: min(43vw, 430px); }
+  .works-transition-stage .gallery-card.support-work-card { width: min(23vw, 230px); }
+  .contact-section { padding: 18vh 8vw; }
+  .contact-copy { margin-left: 0; max-width: 68vw; }
+}
+
+@media (max-width: 767px) {
+  .site-header { padding: calc(16px + env(safe-area-inset-top)) calc(18px + env(safe-area-inset-right)) 16px calc(18px + env(safe-area-inset-left)); }
+  .brand-mark { max-width: calc(100vw - 110px); }
+  .brand-mark span { font-size: clamp(14px, 4.5vw, 17px); letter-spacing: .12em; white-space: nowrap; }
+  .brand-mark small { max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 7px; letter-spacing: .12em; }
+  .header-actions { gap: 10px; }
+  .menu-button { width: 44px; min-width: 44px; height: 44px; padding: 0 8px; }
+  .menu-panel { z-index: 10; align-content: start; gap: 0; padding: calc(96px + env(safe-area-inset-top)) calc(24px + env(safe-area-inset-right)) calc(40px + env(safe-area-inset-bottom)) calc(24px + env(safe-area-inset-left)); overflow-y: auto; }
+  .menu-panel > a { min-height: 54px; gap: 14px; padding: 14px 0; font-size: clamp(28px, 8vw, 42px); letter-spacing: -.07em; }
+  .menu-panel > a span { min-width: 22px; font-size: 9px; }
+  .menu-panel-note { margin-top: 30px; max-width: 290px; font-size: 11px; }
+  .scroll-progress { height: 3px; }
+  .scroll-dial { left: calc(12px + env(safe-area-inset-left)); bottom: calc(12px + env(safe-area-inset-bottom)); width: 52px; height: 52px; transform: none; }
+  .scroll-dial-core { font-size: 5.5px; }
+  .scroll-dial-core strong { font-size: 6.5px; }
+
+  .hero-motion, .about-motion { height: auto; }
+  .hero-stage { height: 100svh; min-height: 620px; padding: 0; }
+  .hero-video { opacity: .62; object-position: 62% 50%; filter: brightness(.78) saturate(.86) contrast(1.02); }
+  .hero-video-overlay { background: linear-gradient(0deg, rgba(5,7,10,.88) 0%, rgba(5,7,10,.5) 35%, rgba(5,7,10,.1) 70%), linear-gradient(90deg, rgba(5,7,10,.2), transparent 68%); }
+  .hero-stage .hero-copy { position: absolute; left: calc(20px + env(safe-area-inset-left)); right: calc(20px + env(safe-area-inset-right)); bottom: 15%; max-width: none; }
+  .hero-stage .hero-copy::before { inset: -8vh -12vw -8vh; background: radial-gradient(ellipse at 35% 60%, rgba(5,7,10,.72), rgba(5,7,10,.24) 52%, transparent 82%); }
+  .hero-stage .hero-copy h1 { font-size: clamp(34px, 9.6vw, 48px); line-height: 1.17; letter-spacing: -.08em; }
+  .hero-line > span { white-space: normal; }
+  .hero-stage .hero-lead { max-width: 330px; margin-top: 22px; font-size: 11px; line-height: 1.9; }
+  .hero-stage .hero-copy .eyebrow { margin-bottom: 14px; font-size: 8px; letter-spacing: .2em; }
+  .hero-core-wrap { top: 7vh; right: -27vw; width: 88vw; height: 48vh; opacity: .58; }
+  .hero-core-label, .hero-bridge-copy { display: none; }
+  .hero-stage .hero-footer-note { left: auto; right: calc(18px + env(safe-area-inset-right)); bottom: calc(20px + env(safe-area-inset-bottom)); writing-mode: vertical-rl; font-size: 7px; }
+
+  .about-stage { height: auto !important; min-height: 0; padding: 18vh calc(22px + env(safe-area-inset-right)) 16vh calc(22px + env(safe-area-inset-left)); overflow: visible; }
+  .about-stage::after { right: 5vw; bottom: 2vh; font-size: 45vw; }
+  .about-bridge-core { top: 5vh; left: -17vw; width: 78vw; height: 32vh; opacity: .32; }
+  .about-layout { height: auto; display: block; padding-top: 17vh; }
+  .about-visual { min-height: 160px; margin-bottom: 8vh; }
+  .about-visual::after { inset: 4% 6% 12%; }
+  .about-visual-line { left: 50%; height: 82%; }
+  .about-visual-caption { right: 2%; bottom: 12%; }
+  .about-copy { max-width: none; }
+  .about-copy h2 { font-size: clamp(36px, 10vw, 48px); }
+  .about-copy p:not(.eyebrow) { font-size: 12px; line-height: 1.95; }
+  .about-tags { gap: 6px; margin-top: 20px; }
+  .about-tags span { padding: 8px 9px; font-size: 8px; }
+  .about-to-workflow { right: 4vw; bottom: 3vh; }
+
+  .workflow-motion { height: auto; }
+  .workflow-stage { height: auto !important; min-height: 0; padding: 14vh calc(22px + env(safe-area-inset-right)) 14vh calc(22px + env(safe-area-inset-left)); overflow: visible; }
+  .workflow-stage::after { right: 3vw; bottom: 0; font-size: 47vw; }
+  .workflow-heading { width: auto; min-height: 0; margin: 0 0 9vh; text-align: left; }
+  .workflow-heading h2 { font-size: clamp(36px, 10vw, 48px); }
+  .workflow-support { max-width: 320px; margin: 20px 0 0; font-size: 11px; line-height: 1.9; }
+  .workflow-track { position: relative; left: auto; right: auto; top: auto; bottom: auto; height: auto; display: grid; grid-template-columns: 1fr; gap: 22px; padding-left: 28px; }
+  .workflow-track-line { display: block; top: 18px; bottom: 18px; left: 8px; right: auto; width: 1px; height: auto; }
+  .workflow-connector { display: none; }
+  .workflow-moving-dot { display: block; top: 18px; left: 8px; opacity: .8; }
+  .workflow-card { position: relative; inset: auto; height: auto; min-height: 0; padding: 22px 18px 30px; opacity: 1 !important; transform: none !important; overflow: hidden; }
+  .workflow-card:not(.is-active) { opacity: .84 !important; }
+  .workflow-card.is-active { border-color: color-mix(in srgb, var(--accent) 70%, rgba(255,255,255,.15)); box-shadow: 0 16px 54px color-mix(in srgb, var(--accent) 14%, transparent); }
+  .workflow-card.is-active .graphic-ring { box-shadow: 0 0 28px color-mix(in srgb, var(--accent) 46%, transparent); }
+  .workflow-graphic { height: 128px; margin-top: 14px; }
+  .workflow-card-copy h3 { font-size: 19px; margin-bottom: 12px; }
+  .workflow-card-copy p { max-width: none; font-size: 11px; line-height: 1.85; }
+  .workflow-complete { position: relative; left: auto; right: auto; bottom: auto; margin: 8vh 0 0; transform: none; white-space: normal; text-align: left; font-size: 11px; line-height: 1.8; }
+  .workflow-to-skills { display: none; }
+
+  .skills-motion { height: auto; }
+  .skills-stage { height: auto !important; min-height: 0; padding: 14vh calc(22px + env(safe-area-inset-right)) 14vh calc(22px + env(safe-area-inset-left)); overflow: visible; }
+  .skills-stage::after { right: 4vw; bottom: 0; font-size: 44vw; }
+  .skills-heading { position: relative; left: auto; top: auto; width: auto; max-width: none; transform: none; text-align: left; }
+  .skills-heading h2 { font-size: clamp(35px, 9.6vw, 46px); }
+  .skills-network { position: relative; left: auto; top: auto; width: min(76vw, 310px); height: min(76vw, 310px); margin: 8vh auto 6vh; transform: none; }
+  .skills-number { right: 6vw; top: 12vh; font-size: 100px; }
+  .skills-panels { position: relative; left: auto; right: auto; bottom: auto; width: auto; min-height: 0; margin: 0; transform: none; text-align: left; }
+  .skill-panel { position: relative; opacity: 1 !important; transform: none !important; margin-top: 28px; padding-top: 22px; border-top: 1px solid rgba(255,255,255,.14); }
+  .skill-panel h3 { font-size: 25px; }
+  .skill-panel span { font-size: 11px; line-height: 1.8; }
+  .skills-to-works { position: relative; left: auto; right: auto; bottom: auto; justify-content: flex-start; margin-top: 10vh; transform: none !important; }
+
+  .works-transition-motion { height: auto; }
+  .works-transition-stage { height: auto !important; min-height: 0; padding: 14vh calc(22px + env(safe-area-inset-right)) 15vh calc(22px + env(safe-area-inset-left)); overflow: visible; perspective: none; }
+  .works-transition-heading { position: relative; left: auto; top: auto; width: auto; transform: none; text-align: left; }
+  .works-transition-heading h2 { font-size: clamp(35px, 9.6vw, 46px); }
+  .works-transition-heading .eyebrow { margin-bottom: 20px; }
+  .works-transition-stage .gallery-camera { position: relative; inset: auto; display: grid; gap: 18px; padding-top: 8vh; transform: none !important; }
+  .works-transition-stage .gallery-card,
+  .works-transition-stage .gallery-card.major-work-card,
+  .works-transition-stage .gallery-card.support-work-card { position: relative; left: auto; top: auto; width: 100%; opacity: 1 !important; visibility: visible !important; transform: none !important; border-radius: 14px; }
+  .works-transition-stage .gallery-card.support-work-card { display: none; }
+  .works-transition-stage .gallery-card-image { aspect-ratio: 16 / 9; }
+  .works-transition-stage .gallery-card-info { padding: 16px 17px 18px; }
+  .works-transition-stage .gallery-card-info strong { font-size: 17px; }
+  .works-transition-stage .gallery-card-link-label { opacity: 1; font-size: 9px !important; }
+  .works-transition-stage .works-seed, .works-transition-meta, .works-transition-note { display: none; }
+
+  .contact-section { min-height: auto; padding: 18vh calc(22px + env(safe-area-inset-right)) calc(18vh + env(safe-area-inset-bottom)) calc(22px + env(safe-area-inset-left)); }
+  .contact-copy { margin-left: 0; max-width: none; }
+  .contact-copy h2 { font-size: clamp(36px, 10vw, 48px); line-height: 1.18; }
+  .contact-copy > p:not(.eyebrow) { margin-top: 26px; font-size: 12px; line-height: 1.9; }
+  .contact-button { min-height: 48px; justify-content: center; width: min(100%, 330px); margin-top: 28px; }
+  .contact-section > .abstract-core { right: -35vw; bottom: -4vh; width: 85vw; height: 42vh; opacity: .22; }
+  .site-footer { gap: 12px; padding: 18px calc(22px + env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom)) calc(22px + env(safe-area-inset-left)); line-height: 1.6; }
+}
+
+@media (max-width: 390px) {
+  .brand-mark small { font-size: 6px; letter-spacing: .08em; }
+  .hero-stage .hero-copy { bottom: 13%; }
+  .hero-stage .hero-copy h1 { font-size: clamp(31px, 9.5vw, 38px); }
+  .hero-stage .hero-lead { max-width: 300px; font-size: 10.5px; }
+  .hero-core-wrap { top: 6vh; right: -35vw; width: 100vw; opacity: .5; }
+  .workflow-stage, .skills-stage, .works-transition-stage, .contact-section { padding-left: 18px; padding-right: 18px; }
+  .workflow-track { padding-left: 24px; }
+  .workflow-card { padding-left: 15px; padding-right: 15px; }
+  .skills-network { width: 72vw; height: 72vw; }
+  .skill-panel h3 { font-size: 22px; }
+}
+
 /* Work detail pages ------------------------------------------------------ */
 .work-detail-page { min-height: 100vh; overflow: hidden; background: #05070a; color: var(--ink); }
 .work-detail-header { display: flex; justify-content: space-between; align-items: center; padding: 28px 5vw; border-bottom: 1px solid rgba(255,255,255,.12); color: #8e9aa8; font-size: 9px; letter-spacing: .16em; }
@@ -568,4 +718,26 @@ h1, h2, h3, h4, strong, .brand-mark span, .menu-panel > a { font-weight: 700; }
   .work-detail-next { margin: 0 8vw; padding: 9vh 0; }
   .work-detail-next a { align-items: start; flex-direction: column; }
   .work-detail-footer { align-items: start; flex-direction: column; margin: 0 8vw; padding-bottom: 28px; }
+}
+
+@media (max-width: 767px) {
+  .work-detail-page { overflow-x: hidden; }
+  .work-detail-header { padding: calc(16px + env(safe-area-inset-top)) calc(20px + env(safe-area-inset-right)) 16px calc(20px + env(safe-area-inset-left)); }
+  .work-detail-back { min-height: 44px; display: inline-flex; align-items: center; }
+  .work-detail-hero { display: flex; flex-direction: column; align-items: stretch; gap: 34px; min-height: 0; padding: 9vh calc(20px + env(safe-area-inset-right)) 8vh calc(20px + env(safe-area-inset-left)); }
+  .work-detail-hero-copy { max-width: none; }
+  .work-detail-hero-copy h1 { font-size: clamp(34px, 10vw, 48px); overflow-wrap: anywhere; }
+  .work-detail-hero-copy > p:not(.eyebrow) { margin-top: 22px; font-size: 12px; line-height: 1.9; }
+  .work-detail-image { width: 100%; border-radius: 12px; }
+  .work-detail-body { display: block; margin: 0 calc(20px + env(safe-area-inset-right)) 0 calc(20px + env(safe-area-inset-left)); }
+  .work-detail-body section { min-height: 0; padding: 28px 20px; }
+  .work-detail-body h2 { font-size: clamp(24px, 7vw, 34px); }
+  .work-detail-body section > p:not(.eyebrow) { font-size: 12px; line-height: 1.9; }
+  .work-detail-tech > div { gap: 8px; }
+  .work-detail-tech > div span { max-width: 100%; overflow-wrap: anywhere; }
+  .work-detail-next { margin: 0 calc(20px + env(safe-area-inset-right)) 0 calc(20px + env(safe-area-inset-left)); padding: 9vh 0; }
+  .work-detail-next a { min-height: 44px; }
+  .work-detail-next strong { font-size: clamp(28px, 8vw, 42px); overflow-wrap: anywhere; }
+  .work-detail-footer { margin: 0 calc(20px + env(safe-area-inset-right)) 0 calc(20px + env(safe-area-inset-left)); padding-bottom: calc(28px + env(safe-area-inset-bottom)); }
+  .work-detail-footer .contact-button { width: min(100%, 330px); justify-content: center; min-height: 48px; }
 }

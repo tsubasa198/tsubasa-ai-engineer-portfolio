@@ -41,7 +41,7 @@ export default async function WorkDetailPage({ params }: WorkPageProps) {
           <p>{project.description}</p>
           <div className="work-detail-meta"><span>{project.category}</span><span>{project.year}</span></div>
         </div>
-        <div className="work-detail-image"><Image src={project.image} alt={`${project.title}のメインビジュアル`} width={1672} height={941} priority unoptimized /></div>
+        <div className="work-detail-image"><Image src={project.image} alt={`${project.title}のメインビジュアル`} width={1672} height={941} sizes="(max-width: 767px) 100vw, (max-width: 1023px) 90vw, 60vw" priority unoptimized /></div>
       </div>
       <div className="work-detail-body">
         <section><p className="eyebrow">01 / BACKGROUND</p><h2>制作背景</h2><p>{project.background}</p></section>
