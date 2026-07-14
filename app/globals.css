@@ -513,6 +513,17 @@ h1, h2, h3, h4, strong, .brand-mark span, .menu-panel > a { font-weight: 700; }
   .works-transition-motion { height: 420vh; }
 }
 
+/* Phase 4: give the Hero and About motion stages more reading room on PC tiers. */
+@media (min-width: 1024px) {
+  .animated-portfolio[data-pc-tier="large"] .hero-motion { height: 270vh; }
+  .animated-portfolio[data-pc-tier="standard"] .hero-motion { height: 295vh; }
+  .animated-portfolio[data-pc-tier="compact"] .hero-motion { height: 280vh; }
+
+  .animated-portfolio[data-pc-tier="large"] .about-motion { height: 205vh; }
+  .animated-portfolio[data-pc-tier="standard"] .about-motion { height: 225vh; }
+  .animated-portfolio[data-pc-tier="compact"] .about-motion { height: 215vh; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .hero-motion, .about-motion, .workflow-motion, .skills-motion, .works-transition-motion { height: auto !important; }
 }
