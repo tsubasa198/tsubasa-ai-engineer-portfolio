@@ -189,7 +189,7 @@ function WorkflowCard({ step, active = false, cardRef }: { step: (typeof workflo
 }
 
 function WorkflowSection() {
-  const [activeStep, setActiveStep] = useState("01");
+  const [activeStep, setActiveStep] = useState("00");
   const cardRefs = useRef<Record<string, HTMLElement | null>>({});
 
   useEffect(() => {
@@ -214,7 +214,7 @@ function SkillsSection() {
 }
 
 function WorksTransitionSection() {
-  return <section id="works" className="motion-stage-section works-transition-motion"><div className="motion-stage works-transition-stage"><div className="works-transition-grid" aria-hidden="true" /><div className="works-transition-heading"><p className="eyebrow">SELECTED WORKS</p><h2 aria-label="現場の不便を、使われるプロダクトへ。"><span className="works-line" aria-hidden="true">現場の不便を、</span><span className="works-line works-line-strong" aria-hidden="true">使われるプロダクトへ。</span></h2></div><div className="works-seed" aria-hidden="true"><span /><span /><span /><span /></div><div className="gallery-camera">{galleryCards.map((card) => <GalleryCard key={card.id} card={card} />)}</div><div className="works-transition-meta"><span>WORKS</span><strong>05</strong></div></div></section>;
+  return <section id="works" className="motion-stage-section works-transition-motion"><div className="motion-stage works-transition-stage"><div className="works-transition-grid" aria-hidden="true" /><div className="works-transition-heading"><p className="eyebrow">SELECTED WORKS</p><h2 aria-label="現場の不便を、使われるプロダクトへ。"><span className="works-line" aria-hidden="true">現場の不便を、</span><span className="works-line works-line-strong" aria-hidden="true">使われるプロダクトへ。</span></h2></div><div className="works-seed" aria-hidden="true"><span /><span /><span /><span /></div><div className="gallery-camera">{galleryCards.map((card) => <GalleryCard key={card.id} card={card} />)}</div></div></section>;
 }
 
 function GalleryCard({ card }: { card: (typeof galleryCards)[number] }) {
@@ -253,10 +253,10 @@ export default function Home() {
     const restoreMotionStyles = () => {
       const resetTargets = root.querySelectorAll<HTMLElement>([
         ".hero-video-overlay", ".hero-copy", ".hero-copy .eyebrow", ".hero-copy .hero-line > span", ".hero-core-wrap", ".hero-core", ".hero-core .core-orbit", ".hero-bridge-copy",
-        ".about-motion .bridge-core", ".about-motion .bridge-core .core-orbit", ".about-motion .about-copy", ".about-motion .about-visual-node",
+        ".about-motion .bridge-core", ".about-motion .bridge-core .core-orbit", ".about-motion .about-copy", ".about-motion .about-copy .eyebrow", ".about-motion .about-copy h2", ".about-motion .about-copy > p:not(.eyebrow)", ".about-motion .about-tags", ".about-motion .about-visual", ".about-motion .about-visual-glow", ".about-motion .about-portrait", ".about-motion .about-visual-node", ".about-motion .about-visual-caption",
         ".workflow-motion .workflow-card", ".workflow-motion .graphic-ring", ".workflow-motion .graphic-dot", ".workflow-motion .workflow-connector", ".workflow-motion .workflow-complete", ".workflow-motion .workflow-to-skills",
-        ".skills-motion .skill-panel", ".skills-motion .skills-number", ".skills-motion .network-ring", ".skills-motion .skills-network", ".skills-motion .skills-heading", ".skills-motion .skills-to-works",
-        ".works-transition-motion .works-line", ".works-transition-motion .works-transition-heading", ".works-transition-motion .works-seed", ".works-transition-motion .gallery-camera", ".works-transition-motion .works-transition-note", ".works-transition-motion .works-transition-meta",
+        ".skills-motion .skill-panel", ".skills-motion .skills-number", ".skills-motion .network-ring", ".skills-motion .skills-network", ".skills-motion .skills-heading", ".skills-motion .skills-heading .eyebrow", ".skills-motion .skills-heading h2", ".skills-motion .skills-support", ".skills-motion .skills-to-works",
+        ".works-transition-motion .works-line", ".works-transition-motion .works-transition-heading", ".works-transition-motion .works-seed", ".works-transition-motion .gallery-camera",
       ].join(","));
       gsap.set(resetTargets, { clearProps: "all" });
       galleryCards.forEach((card) => {
@@ -301,9 +301,18 @@ export default function Home() {
         }
 
         if (profile.isMobile) {
-        gsap.set(".about-motion .about-copy", { opacity: 1, y: 0 });
+        gsap.set(".about-motion .about-visual, .about-motion .about-copy", { opacity: 1, y: 0 });
         } else {
-        const about = gsap.timeline().to(".about-motion .bridge-core", { x: "-12vw", y: "-8vh", scale: .72, duration: .35 }, 0).to(".about-motion .bridge-core .core-orbit", { rotation: "+=70", stagger: .06, duration: .5 }, 0).fromTo(".about-motion .about-copy", { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: .25 }, .22).to(".about-motion .bridge-core .node-a", { x: "-10vw", y: "-7vh", duration: .22 }, .45).to(".about-motion .bridge-core .node-b", { x: "10vw", y: "7vh", duration: .22 }, .45);
+        gsap.set(".about-motion .about-visual", { opacity: 0, y: 20 });
+        gsap.set(".about-motion .about-visual-glow", { opacity: 0, scale: .9 });
+        gsap.set(".about-motion .about-portrait", { opacity: 0, y: 24 });
+        gsap.set(".about-motion .about-visual-node, .about-motion .about-visual-caption", { opacity: 0, y: 10 });
+        gsap.set(".about-motion .about-copy", { autoAlpha: 1, y: 0 });
+        gsap.set(".about-motion .about-copy .eyebrow", { opacity: 0, y: 12 });
+        gsap.set(".about-motion .about-copy h2", { opacity: 0, y: 18 });
+        gsap.set(".about-motion .about-copy > p:not(.eyebrow)", { opacity: 0, y: 16 });
+        gsap.set(".about-motion .about-tags", { opacity: 0, y: 10 });
+        const about = gsap.timeline().to(".about-motion .about-copy .eyebrow", { autoAlpha: 1, y: 0, duration: .12 }, .14).to(".about-motion .about-copy h2", { autoAlpha: 1, y: 0, duration: .16 }, .22).to(".about-motion .about-visual", { autoAlpha: 1, y: 0, duration: .12 }, .26).to(".about-motion .about-visual-glow", { autoAlpha: 1, scale: 1, duration: .16 }, .28).to(".about-motion .about-portrait", { autoAlpha: 1, y: 0, duration: .18 }, .34).to(".about-motion .about-copy > p:not(.eyebrow)", { autoAlpha: 1, y: 0, duration: .18, stagger: .04 }, .42).to(".about-motion .about-visual-node, .about-motion .about-visual-caption", { autoAlpha: 1, y: 0, duration: .14, stagger: .03 }, .5).to(".about-motion .about-tags", { autoAlpha: 1, y: 0, duration: .14 }, .56).to(".about-motion .bridge-core", { x: "-12vw", y: "-8vh", scale: .72, duration: .35 }, 0).to(".about-motion .bridge-core .core-orbit", { rotation: "+=70", stagger: .06, duration: .5 }, 0).to(".about-motion .bridge-core .node-a", { x: "-10vw", y: "-7vh", duration: .22 }, .45).to(".about-motion .bridge-core .node-b", { x: "10vw", y: "7vh", duration: .22 }, .45);
         pageTimelines.push(about);
         pin(".about-motion", ".about-stage", about);
         }
@@ -318,14 +327,12 @@ export default function Home() {
       } else {
         const workflowTl = gsap.timeline();
         workflowTl.addLabel("step-01", .1).addLabel("step-02", .38).addLabel("step-03", .69).addLabel("step-04", 1.02);
-        gsap.set(workflowCards, { opacity: .2, scale: .94, y: 18 });
-        gsap.set(workflowCards[0], { opacity: 1, scale: 1.035, y: 0 });
+        gsap.set(workflowCards, { opacity: .4, scale: 1, y: 0 });
         gsap.set(workflowRings.flat(), { scale: .96, opacity: .42, transformOrigin: "center center" });
         gsap.set(workflowDots.filter(Boolean), { opacity: 0, scale: .72, transformOrigin: "center center" });
-        gsap.set(workflowRings[0], { scale: 1.12, opacity: 1 });
-        gsap.set(workflowDots[0], { opacity: 1, scale: 1.2 });
+        gsap.set(workflowRings[0], { scale: 1, opacity: .55 });
         gsap.set(".workflow-motion .workflow-connector", { scaleX: 0, transformOrigin: "left center" });
-        workflowTl.to(".workflow-motion .connector-1", { scaleX: 1, duration: .14 }, .2).to(workflowRings[0], { scale: 1, opacity: .42, duration: .12 }, .28).to(workflowDots[0], { opacity: 0, scale: .72, duration: .12 }, .28).to(workflowCards[0], { opacity: .22, scale: .96, duration: .11 }, .32).to(workflowCards[1], { opacity: 1, scale: 1.035, y: 0, duration: .15 }, .32).to(workflowRings[1], { scale: 1.12, opacity: 1, duration: .15 }, .34).to(workflowDots[1], { opacity: 1, scale: 1.2, duration: .12 }, .36).to(".workflow-motion .connector-2", { scaleX: 1, duration: .14 }, .51).to(workflowRings[1], { scale: 1, opacity: .42, duration: .12 }, .59).to(workflowDots[1], { opacity: 0, scale: .72, duration: .12 }, .59).to(workflowCards[1], { opacity: .22, scale: .96, duration: .11 }, .63).to(workflowCards[2], { opacity: 1, scale: 1.035, y: 0, duration: .15 }, .63).to(workflowRings[2], { scale: 1.12, opacity: 1, duration: .15 }, .65).to(workflowDots[2], { opacity: 1, scale: 1.2, duration: .12 }, .67).to(".workflow-motion .connector-3", { scaleX: 1, duration: .14 }, .82).to(workflowRings[2], { scale: 1, opacity: .42, duration: .12 }, .9).to(workflowDots[2], { opacity: 0, scale: .72, duration: .12 }, .9).to(workflowCards[2], { opacity: .22, scale: .96, duration: .11 }, .94).to(workflowCards[3], { opacity: 1, scale: 1.035, y: 0, duration: .15 }, .94).to(workflowRings[3], { scale: 1.12, opacity: 1, duration: .15 }, .96).to(workflowDots[3], { opacity: 1, scale: 1.2, duration: .12 }, .98).to(workflowCards, { opacity: 1, scale: 1, y: 0, duration: .18, stagger: .03 }, 1.22).to(workflowCards[3], { opacity: 1, duration: .08 }, 1.4).fromTo(".workflow-motion .workflow-complete", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: .16 }, 1.34).to(".workflow-motion .workflow-to-skills", { opacity: 1, scale: 1, duration: .18 }, 1.42).addLabel("workflow-complete");
+        workflowTl.to(workflowCards[0], { opacity: 1, scale: 1.025, duration: .08, ease: "power2.out" }, .06).to(workflowRings[0], { scale: 1.08, opacity: 1, duration: .08, ease: "power2.out" }, .08).to(workflowDots[0], { opacity: 1, scale: 1.12, duration: .08, ease: "power2.out" }, .08).to(".workflow-motion .connector-1", { scaleX: 1, duration: .14 }, .2).to(workflowRings[0], { scale: 1, opacity: .42, duration: .12 }, .28).to(workflowDots[0], { opacity: 0, scale: .72, duration: .12 }, .28).to(workflowCards[0], { opacity: .58, scale: 1, duration: .11 }, .32).to(workflowCards[1], { opacity: 1, scale: 1.025, y: 0, duration: .15 }, .32).to(workflowRings[1], { scale: 1.08, opacity: 1, duration: .15 }, .34).to(workflowDots[1], { opacity: 1, scale: 1.12, duration: .12 }, .36).to(".workflow-motion .connector-2", { scaleX: 1, duration: .14 }, .51).to(workflowRings[1], { scale: 1, opacity: .42, duration: .12 }, .59).to(workflowDots[1], { opacity: 0, scale: .72, duration: .12 }, .59).to(workflowCards[1], { opacity: .58, scale: 1, duration: .11 }, .63).to(workflowCards[2], { opacity: 1, scale: 1.025, y: 0, duration: .15 }, .63).to(workflowRings[2], { scale: 1.08, opacity: 1, duration: .15 }, .65).to(workflowDots[2], { opacity: 1, scale: 1.12, duration: .12 }, .67).to(".workflow-motion .connector-3", { scaleX: 1, duration: .14 }, .82).to(workflowRings[2], { scale: 1, opacity: .42, duration: .12 }, .9).to(workflowDots[2], { opacity: 0, scale: .72, duration: .12 }, .9).to(workflowCards[2], { opacity: .58, scale: 1, duration: .11 }, .94).to(workflowCards[3], { opacity: 1, scale: 1.025, y: 0, duration: .15 }, .94).to(workflowRings[3], { scale: 1.08, opacity: 1, duration: .15 }, .96).to(workflowDots[3], { opacity: 1, scale: 1.12, duration: .12 }, .98).to(workflowCards, { opacity: 1, scale: 1, y: 0, duration: .18, stagger: .03 }, 1.22).to(workflowCards[3], { opacity: 1, duration: .08 }, 1.4).fromTo(".workflow-motion .workflow-complete", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: .16 }, 1.34).to(workflowCards, { opacity: .82, duration: .1 }, 1.32).to(".workflow-motion .workflow-complete", { opacity: .82, duration: .1 }, 1.32).to(".workflow-motion .workflow-to-skills", { opacity: 1, scale: 1, duration: .18 }, 1.42).addLabel("workflow-complete");
         pageTimelines.push(workflowTl);
         pin(".workflow-motion", ".workflow-stage", workflowTl);
       }
@@ -335,9 +342,12 @@ export default function Home() {
         gsap.set(skillPanels, { opacity: 1, y: 0, scale: 1 });
       } else {
         const skillsTl = gsap.timeline();
-        gsap.set(skillPanels, { opacity: 0, y: 25, scale: .92 });
-        gsap.set(skillPanels[0], { opacity: 1, y: 0, scale: 1 });
-        skillPanels.forEach((panel, index) => { const start = index / skillPanels.length; const others = skillPanels.filter((_, i) => i !== index); skillsTl.addLabel(`capability-${String(index + 1).padStart(2, "0")}`, start + .08).to(".skills-motion .skills-number", { textContent: String(index + 1).padStart(2, "0"), duration: .01 }, start).to(others, { opacity: 0, y: -15, scale: .92, duration: .04 }, start).to(panel, { opacity: 1, y: 0, scale: 1, duration: .09 }, start + .04).to(`.skills-motion .network-ring:nth-of-type(${(index % 3) + 1})`, { rotation: "+=55", scale: 1.12 + index * .03, duration: .16 }, start); });
+        gsap.set(skillPanels, { autoAlpha: 0, pointerEvents: "none", y: 25, scale: .92 });
+        gsap.set(".skills-motion .skills-heading .eyebrow, .skills-motion .skills-heading h2, .skills-motion .skills-support", { opacity: 0, y: 12 });
+        gsap.set(".skills-motion .skills-number", { opacity: 0 });
+        gsap.set(".skills-motion .skills-network", { opacity: 0, scale: .96 });
+        skillsTl.to(".skills-motion .skills-heading .eyebrow", { opacity: 1, y: 0, duration: .08 }, .04).to(".skills-motion .skills-heading h2", { opacity: 1, y: 0, duration: .1 }, .08).to(".skills-motion .skills-support", { opacity: 1, y: 0, duration: .1 }, .12).to(".skills-motion .skills-network", { opacity: 1, scale: 1, duration: .14 }, .2).to(".skills-motion .skills-number", { opacity: 1, duration: .08 }, .24);
+        skillPanels.forEach((panel, index) => { const start = .32 + index * .1; skillsTl.addLabel(`capability-${String(index + 1).padStart(2, "0")}`, start + .08).set(skillPanels, { autoAlpha: 0, pointerEvents: "none" }, start).to(".skills-motion .skills-number", { textContent: String(index + 1).padStart(2, "0"), duration: .01 }, start).to(panel, { autoAlpha: 1, pointerEvents: "auto", y: 0, scale: 1, duration: .06 }, start + .02).to(`.skills-motion .network-ring:nth-of-type(${(index % 3) + 1})`, { rotation: "+=55", scale: 1.12 + index * .03, duration: .16 }, start); });
         skillsTl.to(".skills-motion .skills-network", { scale: .58, x: 0, y: "-18vh", duration: .2 }, .88).to(".skills-motion .skills-heading", { opacity: 0, y: "-2vh", duration: .16 }, .88).to(".skills-motion .skills-to-works", { opacity: 1, y: 0, duration: .16 }, .92).addLabel("skills-complete");
         pageTimelines.push(skillsTl);
         pin(".skills-motion", ".skills-stage", skillsTl);
@@ -352,11 +362,12 @@ export default function Home() {
         const galleryTl = gsap.timeline();
         galleryTl.addLabel("works-heading", 0).addLabel("heading-split", .2).addLabel("projects-appear", .34).addLabel("projects-spread", .62).addLabel("projects-aligned", .8);
         gsap.set(galleryCardsEls, { opacity: 0, visibility: "hidden" });
-        gsap.set(".works-transition-motion .works-line", { opacity: 1, y: 0 });
+        gsap.set(".works-transition-motion .works-line", { opacity: 0, y: 0 });
         gsap.set(".works-transition-motion .works-transition-heading", { opacity: 1 });
+        gsap.set(".works-transition-motion .works-transition-heading .eyebrow", { opacity: 0, y: 10 });
         gsap.set(".works-transition-motion .works-seed", { opacity: 0, scale: .72 });
         galleryCards.forEach((card) => { const element = root.querySelector<HTMLElement>(`[data-gallery-card="${card.id}"]`); if (!element) return; const revealAt = .34 + card.enter * .6; gsap.set(element, { "--gx": card.sx, "--gy": card.sy, "--gz": card.sz, "--gs": card.ss, borderRadius: "18px" }); galleryTl.set(element, { visibility: "visible" }, revealAt).to(element, { opacity: card.role === "image" ? .74 : .88, "--gx": card.x, "--gy": card.y, "--gz": card.z, "--gr": card.r, "--gs": card.s, duration: .18, ease: "power2.out" }, revealAt); });
-        galleryTl.to(".works-transition-motion .works-line:first-child", { y: "-19vh", x: "-2vw", opacity: .08, duration: .2, ease: "power3.inOut" }, .2).to(".works-transition-motion .works-line-strong", { y: "19vh", x: "2vw", opacity: .08, duration: .2, ease: "power3.inOut" }, .2).to(".works-transition-motion .works-transition-heading .eyebrow", { opacity: 0, duration: .12 }, .23).to(".works-transition-motion .works-seed", { opacity: .7, scale: 1.2, rotation: 90, duration: .18 }, .31).to(".works-transition-motion .gallery-camera", { x: "-2vw", y: "-2vh", scale: 1.06, duration: .26, ease: "power2.inOut" }, .62).to(supportCardsEls, { opacity: 0, visibility: "hidden", "--gz": -980, "--gs": .24, duration: .2, stagger: .015, ease: "power2.in" }, .72);
+        galleryTl.to(".works-transition-motion .works-transition-heading .eyebrow", { opacity: 1, y: 0, duration: .08 }, .04).to(".works-transition-motion .works-line:first-child", { opacity: 1, duration: .1 }, .08).to(".works-transition-motion .works-line-strong", { opacity: 1, duration: .1 }, .12).to(".works-transition-motion .works-line:first-child", { y: "-19vh", x: "-2vw", opacity: 1, duration: .18, ease: "power3.inOut" }, .24).to(".works-transition-motion .works-line-strong", { y: "19vh", x: "2vw", opacity: 1, duration: .18, ease: "power3.inOut" }, .24).to(".works-transition-motion .works-line", { opacity: .86, duration: .1, ease: "power2.out" }, .4).to(".works-transition-motion .works-line", { opacity: .66, duration: .1, ease: "power2.out" }, .46).to(".works-transition-motion .works-line", { opacity: .4, duration: .1, ease: "power2.out" }, .52).to(".works-transition-motion .works-line", { opacity: .08, duration: .12, ease: "power2.out" }, .58).to(".works-transition-motion .works-transition-heading .eyebrow", { opacity: 0, duration: .12 }, .23).to(".works-transition-motion .works-seed", { opacity: .7, scale: 1.2, rotation: 90, duration: .18 }, .31).to(".works-transition-motion .gallery-camera", { x: "-2vw", y: "-2vh", scale: 1.06, duration: .26, ease: "power2.inOut" }, .62).to(supportCardsEls, { opacity: 0, visibility: "hidden", "--gz": -980, "--gs": .24, duration: .2, stagger: .015, ease: "power2.in" }, .72);
         galleryCards.slice(0, 4).forEach((card, index) => {
           const element = root.querySelector<HTMLElement>(`[data-gallery-card="${card.id}"]`);
           if (!element) return;
@@ -365,7 +376,7 @@ export default function Home() {
           const finalY = () => Math.sign(card.finalY) * ((element.offsetHeight * finalScale + Math.min(28, window.innerHeight * .035)) / 2 / window.innerHeight * 100);
           galleryTl.to(element, { "--gx": finalX, "--gy": finalY, "--gz": 0, "--gr": 0, "--gs": finalScale, opacity: 1, borderRadius: "14px", duration: .24, ease: "power3.inOut" }, .78 + index * .035);
         });
-        galleryTl.to(".works-transition-motion .gallery-camera", { x: 0, y: 0, scale: 1, duration: .24, ease: "power2.inOut" }, .78).to(".works-transition-motion .works-transition-heading", { opacity: 0, duration: .16 }, .8).to(".works-transition-motion .works-transition-note, .works-transition-motion .works-transition-meta", { opacity: 0, duration: .1 }, .82).addLabel("works-complete");
+        galleryTl.to(".works-transition-motion .gallery-camera", { x: 0, y: 0, scale: 1, duration: .24, ease: "power2.inOut" }, .78).to(".works-transition-motion .works-transition-heading", { opacity: 0, duration: .16 }, .8).addLabel("works-complete");
         pageTimelines.push(galleryTl);
         pin(".works-transition-motion", ".works-transition-stage", galleryTl);
       }
