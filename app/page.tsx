@@ -75,7 +75,7 @@ function Header() {
 
   return (
     <header className="site-header">
-      <a className="brand-mark" href="#hero" aria-label="トップへ戻る"><span>TSUBASA</span><small>AI ENGINEER / PRODUCT BUILDER</small></a>
+      <a className="brand-mark" href="#hero" aria-label="トップへ戻る"><span>TSUBASA</span><small>AI ENGINEER / FDE</small></a>
       <div className="header-actions"><span className="header-label">PORTFOLIO / 2026</span><button ref={menuButtonRef} className={`menu-button ${open ? "is-open" : ""}`} onClick={() => setOpen((value) => !value)} aria-label={open ? "メニューを閉じる" : "メニューを開く"} aria-expanded={open} aria-controls="site-menu"><span /><span /></button></div>
       <nav ref={menuPanelRef} id="site-menu" className={`menu-panel ${open ? "is-open" : ""}`} aria-hidden={!open} onClick={(event) => { if (event.target === event.currentTarget) setOpen(false); }}><p className="eyebrow">INDEX</p>{navItems.map((item, index) => <a key={item.id} href={`#${item.id}`} tabIndex={open ? 0 : -1} onClick={() => setOpen(false)}><span>0{index + 1}</span>{item.label}</a>)}<p className="menu-panel-note">現場の「こうだったらいいのに」を、プロダクトとして実現する。</p></nav>
     </header>
@@ -109,7 +109,34 @@ function ScrollDial({ progress, isScrolling }: { progress: number; isScrolling: 
     return () => cancelAnimationFrame(frame);
   }, []);
 
-  return <div ref={dialRef} className={`scroll-dial ${isScrolling ? "is-scrolling" : ""}`} style={{ "--dial-progress": progress } as CSSProperties} aria-hidden="true"><div className="scroll-dial-ring dial-ring-outer" /><div className="scroll-dial-ring dial-ring-ticks" /><div className="scroll-dial-core"><span>AI / BUILD /</span><strong>USEFUL</strong></div><i className="scroll-dial-marker" /></div>;
+  return <div ref={dialRef} className={`scroll-dial ${isScrolling ? "is-scrolling" : ""}`} style={{ "--dial-progress": progress } as CSSProperties} aria-hidden="true"><div className="scroll-dial-ring dial-ring-outer" /><div className="scroll-dial-ring dial-ring-ticks" /><div className="scroll-dial-core"><span>AI</span></div><i className="scroll-dial-marker" /></div>;
+}
+
+function ScrollGuide() {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    let dismissed = false;
+    const showTimer = window.setTimeout(() => {
+      if (!dismissed) setVisible(true);
+    }, 800);
+    const hideTimer = window.setTimeout(() => setVisible(false), 3800);
+    const dismiss = () => {
+      dismissed = true;
+      setVisible(false);
+      window.clearTimeout(showTimer);
+      window.clearTimeout(hideTimer);
+      window.removeEventListener("scroll", dismiss);
+    };
+    window.addEventListener("scroll", dismiss, { passive: true, once: true });
+    return () => {
+      window.clearTimeout(showTimer);
+      window.clearTimeout(hideTimer);
+      window.removeEventListener("scroll", dismiss);
+    };
+  }, []);
+
+  return <div className={`scroll-guide ${visible ? "is-visible" : ""}`} aria-hidden="true"><span>SCROLL</span><i><b /></i></div>;
 }
 
 function AbstractCore({ className = "" }: { className?: string }) {
@@ -119,11 +146,11 @@ function AbstractCore({ className = "" }: { className?: string }) {
 function HeroSection() {
   const [videoEnabled, setVideoEnabled] = useState(false);
   useEffect(() => { const media = window.matchMedia("(prefers-reduced-motion: reduce)"); const update = () => setVideoEnabled(!media.matches && window.innerWidth > 767); update(); media.addEventListener("change", update); window.addEventListener("resize", update); return () => { media.removeEventListener("change", update); window.removeEventListener("resize", update); }; }, []);
-  return <section id="hero" className="motion-stage-section hero-motion"><div className="motion-stage hero-stage"><video className="hero-video" autoPlay={videoEnabled} muted loop playsInline preload={videoEnabled ? "metadata" : "none"} poster="/assets/hero/0713-poster.jpg" tabIndex={-1} aria-hidden="true"><source src="/assets/hero/0713.mp4" type="video/mp4" /></video><div className="hero-video-overlay" aria-hidden="true" /><div className="hero-grid" aria-hidden="true" /><div className="hero-copy"><p className="eyebrow">AI ENGINEER / PRODUCT BUILDER</p><h1 aria-label="現場が本当に求めているものを、AIで形にする。"><span className="hero-line" aria-hidden="true"><span>現場が本当に求めて</span></span><span className="hero-line" aria-hidden="true"><span>いるものを、</span></span><span className="hero-line hero-line-strong" aria-hidden="true"><span>AIで形にする。</span></span></h1><p className="hero-lead">業務改善で終わらない。課題整理から設計、実装、導入、改善まで。人とAIの間に、使われ続ける仕組みをつくる。</p></div><div className="hero-core-wrap"><AbstractCore className="hero-core" /><span className="hero-core-label">HUMAN / AI / PRODUCT</span></div><div className="hero-bridge-copy"><p className="eyebrow">THE STARTING POINT</p><p>問いをほどくと、<br /><strong>つくるべきものが見えてくる。</strong></p></div><div className="hero-footer-note"><span>SCROLL TO EXPLORE</span><i /></div></div></section>;
+  return <section id="hero" className="motion-stage-section hero-motion"><div className="motion-stage hero-stage"><video className="hero-video" autoPlay={videoEnabled} muted loop playsInline preload={videoEnabled ? "metadata" : "none"} poster="/assets/hero/0713-poster.jpg" tabIndex={-1} aria-hidden="true"><source src="/assets/hero/0713.mp4" type="video/mp4" /></video><div className="hero-video-overlay" aria-hidden="true" /><div className="hero-grid" aria-hidden="true" /><div className="hero-copy"><p className="eyebrow">AI ENGINEER / FDE</p><h1 aria-label="まだ言葉になっていない現場の課題を、AIで使われる仕組みに変える。"><span className="hero-line" aria-hidden="true"><span>まだ言葉になっていない</span></span><span className="hero-line" aria-hidden="true"><span>現場の課題を、</span></span><span className="hero-line hero-line-strong" aria-hidden="true"><span>AIで使われる仕組みに変える。</span></span></h1><p className="hero-lead">現場に入り込み、業務と判断の流れを理解する。<br />表面的な要望だけでなく、見過ごされていた不便まで拾い上げ、<br />設計・実装・改善まで一貫して担います。</p></div><div className="hero-core-wrap"><AbstractCore className="hero-core" /><span className="hero-core-label">HUMAN / AI / PRODUCT</span></div><div className="hero-bridge-copy"><p className="eyebrow">THE STARTING POINT</p><p>問いをほどくと、<br /><strong>つくるべきものが見えてくる。</strong></p></div><div className="hero-footer-note"><span>SCROLL TO EXPLORE</span><i /></div><ScrollGuide /></div></section>;
 }
 
 function AboutSection() {
-  return <section id="about" className="motion-stage-section about-motion"><div className="motion-stage about-stage"><div className="about-grid" aria-hidden="true" /><div className="about-bridge-core"><AbstractCore className="bridge-core" /></div><div className="about-layout"><div className="about-visual"><div className="about-visual-line" /><span className="about-visual-caption">Tsubasa / AI Engineer</span></div><div className="about-copy"><p className="eyebrow">ABOUT TSUBASA</p><h2>技術の先にいる、<br /><strong>人を見る。</strong></h2><p>システムをつくる前に、そのシステムを使う人の一日を想像する。何に困り、どこで迷い、何が変わればもっと前に進めるのか。</p><p>業務分解から設計、実装、改善まで。AIを組み込むだけでなく、現場に届くプロダクトとして育てることを大切にしています。</p><div className="about-tags"><span>業務分解</span><span>ワークフロー設計</span><span>AIプロダクト開発</span><span>導入・改善</span></div></div></div><div className="about-to-workflow"><span>THE NEXT STEP</span><i /></div></div></section>;
+  return <section id="about" className="motion-stage-section about-motion"><div className="motion-stage about-stage"><div className="about-grid" aria-hidden="true" /><div className="about-bridge-core"><AbstractCore className="bridge-core" /></div><div className="about-layout"><div className="about-visual"><div className="about-visual-glow" aria-hidden="true" /><div className="about-visual-line" aria-hidden="true" /><Image className="about-portrait" src="/assets/tsubasa-avatar-cutout.png" alt="AIエンジニア Tsubasaのイラスト" width={1024} height={1536} sizes="(max-width: 767px) 74vw, 38vw" priority /><span className="about-visual-node node-one" aria-hidden="true" /><span className="about-visual-node node-two" aria-hidden="true" /><span className="about-visual-caption">Tsubasa / AI Engineer / FDE</span></div><div className="about-copy"><p className="eyebrow">ABOUT TSUBASA</p><h2>現場の中から課題を見つけ、<br /><strong>使われ続ける仕組みを構築する。</strong></h2><p>生成AIコースの立ち上げ・運営、企業向けのAI導入支援、業務自動化、Webシステム開発に取り組んできました。</p><p>技術ありきでシステムをつくるのではなく、まずは現場の業務や会話を理解し、課題・制約・判断ポイントを整理することを大切にしています。</p><p>表面的な要望だけでなく、現場自身もまだ言葉にできていない不便まで見つけ出す。</p><p>人とAIの役割を設計し、素早く形にして、実際に使いながら改善する。</p><p>構想や開発だけで終わらせず、現場に定着し、使われ続けるところまでをプロダクト開発だと考えています。</p><div className="about-tags"><span>業務分解</span><span>AI導入支援</span><span>業務自動化</span><span>Webシステム開発</span></div></div></div><div className="about-to-workflow"><span>THE NEXT STEP</span><i /></div></div></section>;
 }
 
 function WorkflowCard({ step, active = false, cardRef }: { step: (typeof workflowSteps)[number]; active?: boolean; cardRef?: (node: HTMLElement | null) => void }) {
@@ -148,15 +175,15 @@ function WorkflowSection() {
     return () => observer.disconnect();
   }, []);
 
-  return <section id="workflow" className="motion-stage-section workflow-motion"><div className="motion-stage workflow-stage"><div className="workflow-grid" aria-hidden="true" /><div className="workflow-heading"><p className="eyebrow">HOW I WORK</p><h2>考え方から、<br /><strong>つくり方まで。</strong></h2><p className="workflow-support">課題を見つけ、流れをつくり、触れる形で試し、現場で育てる。</p></div><div className="workflow-track"><div className="workflow-track-line" aria-hidden="true" /><div className="workflow-connector connector-1" aria-hidden="true" /><div className="workflow-connector connector-2" aria-hidden="true" /><div className="workflow-connector connector-3" aria-hidden="true" /><div className="workflow-moving-dot" aria-hidden="true" />{workflowSteps.map((step) => <WorkflowCard key={step.number} step={step} active={activeStep === step.number} cardRef={(node) => { cardRefs.current[step.number] = node; }} />)}</div><p className="workflow-complete">課題整理から導入・改善まで、一貫して支援する。</p><div className="workflow-to-skills" aria-hidden="true"><span /><i /><b /></div></div></section>;
+  return <section id="workflow" className="motion-stage-section workflow-motion"><div className="motion-stage workflow-stage"><div className="workflow-grid" aria-hidden="true" /><div className="workflow-heading"><p className="eyebrow">HOW I WORK</p><h2>現場に入り込み、<br /><strong>課題の発見から実装まで。</strong></h2><p className="workflow-support">ヒアリングで見えない課題を捉え、業務を分解し、使われる仕組みへ落とし込みます。</p></div><div className="workflow-track"><div className="workflow-track-line" aria-hidden="true" /><div className="workflow-connector connector-1" aria-hidden="true" /><div className="workflow-connector connector-2" aria-hidden="true" /><div className="workflow-connector connector-3" aria-hidden="true" /><div className="workflow-moving-dot" aria-hidden="true" />{workflowSteps.map((step) => <WorkflowCard key={step.number} step={step} active={activeStep === step.number} cardRef={(node) => { cardRefs.current[step.number] = node; }} />)}</div><p className="workflow-complete">ヒアリングから実装まで、現場のそばで一貫して伴走する。</p><div className="workflow-to-skills" aria-hidden="true"><span /><i /><b /></div></div></section>;
 }
 
 function SkillsSection() {
-  return <section id="skills" className="motion-stage-section skills-motion"><div className="motion-stage skills-stage"><div className="skills-heading"><p className="eyebrow">CAPABILITIES</p><h2>つなげる力を、<br /><strong>ひとつのネットワークに。</strong></h2></div><div className="skills-network" aria-hidden="true"><span className="network-ring ring-1" /><span className="network-ring ring-2" /><span className="network-ring ring-3" /><span className="network-node node-1" /><span className="network-node node-2" /><span className="network-node node-3" /><span className="network-node node-4" /><span className="network-node node-5" /><span className="network-line n-line-1" /><span className="network-line n-line-2" /><span className="network-line n-line-3" /><span className="network-line n-line-4" /></div><div className="skills-number" aria-hidden="true">01</div><div className="skills-panels">{skills.map((skill, index) => <div key={skill} className="skill-panel"><p>0{index + 1} / CAPABILITY</p><h3>{skill}</h3><span>課題と技術をつなぎ、実装まで進める。</span></div>)}</div><div className="skills-to-works"><span>FROM SYSTEM TO WORKS</span><i /></div></div></section>;
+  return <section id="skills" className="motion-stage-section skills-motion"><div className="motion-stage skills-stage"><div className="skills-heading"><p className="eyebrow">CAPABILITIES</p><h2>課題を解決する、<br /><strong>プロダクトを。</strong></h2><p className="skills-support">業務設計、AI、自動化、Web開発。必要な技術を組み合わせ、現場で機能する形までつくります。</p></div><div className="skills-network" aria-hidden="true"><span className="network-ring ring-1" /><span className="network-ring ring-2" /><span className="network-ring ring-3" /><span className="network-node node-1" /><span className="network-node node-2" /><span className="network-node node-3" /><span className="network-node node-4" /><span className="network-node node-5" /><span className="network-line n-line-1" /><span className="network-line n-line-2" /><span className="network-line n-line-3" /><span className="network-line n-line-4" /></div><div className="skills-number" aria-hidden="true">01</div><div className="skills-panels">{skills.map((skill, index) => <div key={skill} className="skill-panel"><p>0{index + 1} / CAPABILITY</p><h3>{skill}</h3><span>課題と技術をつなぎ、実装まで進める。</span></div>)}</div><div className="skills-to-works"><span>FROM SYSTEM TO WORKS</span><i /></div></div></section>;
 }
 
 function WorksTransitionSection() {
-  return <section id="works" className="motion-stage-section works-transition-motion"><div className="motion-stage works-transition-stage"><div className="works-transition-grid" aria-hidden="true" /><div className="works-transition-heading"><p className="eyebrow">SELECTED WORKS / SPATIAL GALLERY</p><h2 aria-label="AIとプロダクトで、現場の課題を形にする。"><span className="works-line" aria-hidden="true">AIとプロダクトで、</span><span className="works-line works-line-strong" aria-hidden="true">現場の課題を形にする。</span></h2></div><div className="works-seed" aria-hidden="true"><span /><span /><span /><span /></div><div className="gallery-camera">{galleryCards.map((card) => <GalleryCard key={card.id} card={card} />)}</div><div className="works-transition-meta"><span>WORKS</span><strong>04</strong></div><div className="works-transition-note">SCROLL TO ORGANIZE THE WORKS</div></div></section>;
+  return <section id="works" className="motion-stage-section works-transition-motion"><div className="motion-stage works-transition-stage"><div className="works-transition-grid" aria-hidden="true" /><div className="works-transition-heading"><p className="eyebrow">SELECTED WORKS</p><h2 aria-label="現場の不便を、使われるプロダクトへ。"><span className="works-line" aria-hidden="true">現場の不便を、</span><span className="works-line works-line-strong" aria-hidden="true">使われるプロダクトへ。</span></h2></div><div className="works-seed" aria-hidden="true"><span /><span /><span /><span /></div><div className="gallery-camera">{galleryCards.map((card) => <GalleryCard key={card.id} card={card} />)}</div><div className="works-transition-meta"><span>WORKS</span><strong>04</strong></div></div></section>;
 }
 
 function GalleryCard({ card }: { card: (typeof galleryCards)[number] }) {

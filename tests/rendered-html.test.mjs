@@ -21,10 +21,12 @@ test("server-renders the AI engineer portfolio", async () => {
 
   const html = await response.text();
   assert.match(html, /Tsubasa&#x27;s Portfolio \| AI Engineer \/ FDE/i);
-  assert.match(html, /現場が本当に求めているものを/);
-  assert.match(html, /AIで形にする/);
-  assert.match(html, /SELECTED WORKS \/ SPATIAL GALLERY/);
-  assert.match(html, /業務を分解する/);
+  assert.match(html, /まだ言葉になっていない/);
+  assert.match(html, /AIで使われる仕組みに変える/);
+  assert.match(html, /SELECTED WORKS/);
+  assert.match(html, /現場ヒアリング・課題特定/);
+  assert.match(html, /課題を解決する/);
+  assert.match(html, /scroll-guide/);
   assert.match(html, /\/assets\/projects\/ai-literacy\.png/);
   assert.match(html, /\/works\/project-01/);
   assert.match(html, /詳しく見る/);
