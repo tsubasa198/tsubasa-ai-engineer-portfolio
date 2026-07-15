@@ -19,6 +19,14 @@ const navItems = [
   { id: "contact", label: "CONTACT" },
 ];
 
+const sectionIndexes = [
+  { id: "about", number: "1" },
+  { id: "workflow", number: "2" },
+  { id: "skills", number: "3" },
+  { id: "works", number: "4" },
+  { id: "contact", number: "5" },
+] as const;
+
 const galleryCards = [
   { id: "g01", projectId: "project-01", role: "featured", x: 22, y: -16, z: 80, r: -6, s: 1.05, finalX: -17, finalY: -18, sx: 0, sy: 0, sz: -520, ss: .42, enter: .08 },
   { id: "g02", projectId: "project-02", role: "detail", x: -30, y: 0, z: -90, r: 7, s: .78, finalX: 17, finalY: -18, sx: 0, sy: 0, sz: -620, ss: .38, enter: .18 },
@@ -234,7 +242,7 @@ function HeroSection() {
 }
 
 function AboutSection() {
-  return <section id="about" className="motion-stage-section about-motion"><div className="motion-stage about-stage"><div className="about-grid" aria-hidden="true" /><div className="about-bridge-core"><AbstractCore className="bridge-core" /></div><div className="about-layout"><div className="about-visual"><div className="about-visual-glow" aria-hidden="true" /><Image className="about-portrait" src="/assets/tsubasa-avatar-cutout.png" alt="AIエンジニア Tsubasaのイラスト" width={1024} height={1536} sizes="(max-width: 767px) 74vw, 38vw" priority /><span className="about-visual-node node-one" aria-hidden="true" /><span className="about-visual-node node-two" aria-hidden="true" /><span className="about-visual-caption">Tsubasa / AI Engineer / FDE</span></div><div className="about-copy"><p className="eyebrow">ABOUT TSUBASA</p><h2>現場の課題から、<br /><strong>使われ続ける仕組みをつくる。</strong></h2><p>生成AIコースの立ち上げ・運営、企業向けのAI導入支援、業務自動化、Webシステム開発に取り組んできました。</p><p>技術ありきで考えるのではなく、まずは現場の業務や会話を理解し、課題・制約・判断ポイントを整理することを大切にしています。</p><p>表面的な要望だけでなく、まだ言葉になっていない不便まで見つけ出し、人とAIの役割を設計して、実際に使える仕組みへ落とし込みます。</p><div className="about-tags"><span>業務分解</span><span>AI導入支援</span><span>業務自動化</span><span>Webシステム開発</span></div></div></div><div className="about-to-workflow"><span>THE NEXT STEP</span><i /></div></div></section>;
+  return <section id="about" className="motion-stage-section about-motion"><div className="motion-stage about-stage"><span className="section-index-static" aria-hidden="true">1</span><div className="about-grid" aria-hidden="true" /><div className="about-bridge-core"><AbstractCore className="bridge-core" /></div><div className="about-layout"><div className="about-visual"><div className="about-visual-glow" aria-hidden="true" /><Image className="about-portrait" src="/assets/tsubasa-avatar-cutout.png" alt="AIエンジニア Tsubasaのイラスト" width={1024} height={1536} sizes="(max-width: 767px) 74vw, 38vw" priority /><span className="about-visual-node node-one" aria-hidden="true" /><span className="about-visual-node node-two" aria-hidden="true" /><span className="about-visual-caption">Tsubasa / AI Engineer / FDE</span></div><div className="about-copy"><p className="eyebrow">ABOUT TSUBASA</p><h2>現場の課題から、<br /><strong>使われ続ける仕組みをつくる。</strong></h2><p>生成AIコースの立ち上げ・運営、企業向けのAI導入支援、業務自動化、Webシステム開発に取り組んできました。</p><p>技術ありきで考えるのではなく、まずは現場の業務や会話を理解し、課題・制約・判断ポイントを整理することを大切にしています。</p><p>表面的な要望だけでなく、まだ言葉になっていない不便まで見つけ出し、人とAIの役割を設計して、実際に使える仕組みへ落とし込みます。</p><div className="about-tags"><span>業務分解</span><span>AI導入支援</span><span>業務自動化</span><span>Webシステム開発</span></div></div></div><div className="about-to-workflow"><span>THE NEXT STEP</span><i /></div></div></section>;
 }
 
 function WorkflowCard({ step, active = false, cardRef }: { step: (typeof workflowSteps)[number]; active?: boolean; cardRef?: (node: HTMLElement | null) => void }) {
@@ -259,15 +267,15 @@ function WorkflowSection() {
     return () => observer.disconnect();
   }, []);
 
-  return <section id="workflow" className="motion-stage-section workflow-motion"><div className="motion-stage workflow-stage"><div className="workflow-grid" aria-hidden="true" /><div className="workflow-heading"><p className="eyebrow">HOW I WORK</p><h2>現場に入り込み、<strong>課題の発見から実装まで。</strong></h2><p className="workflow-support">ヒアリングで見えない課題を捉え、業務を分解し、使われる仕組みへ落とし込みます。</p></div><div className="workflow-track"><div className="workflow-track-line" aria-hidden="true" /><div className="workflow-connector connector-1" aria-hidden="true" /><div className="workflow-connector connector-2" aria-hidden="true" /><div className="workflow-connector connector-3" aria-hidden="true" /><div className="workflow-moving-dot" aria-hidden="true" />{workflowSteps.map((step) => <WorkflowCard key={step.number} step={step} active={activeStep === step.number} cardRef={(node) => { cardRefs.current[step.number] = node; }} />)}</div><p className="workflow-complete">ヒアリングから実装まで、現場のそばで一貫して伴走する。</p><div className="workflow-to-skills" aria-hidden="true"><span /><i /><b /></div></div></section>;
+  return <section id="workflow" className="motion-stage-section workflow-motion"><div className="motion-stage workflow-stage"><span className="section-index-static" aria-hidden="true">2</span><div className="workflow-grid" aria-hidden="true" /><div className="workflow-heading"><p className="eyebrow">HOW I WORK</p><h2>現場に入り込み、<strong>課題の発見から実装まで。</strong></h2><p className="workflow-support">ヒアリングで見えない課題を捉え、業務を分解し、使われる仕組みへ落とし込みます。</p></div><div className="workflow-track"><div className="workflow-track-line" aria-hidden="true" /><div className="workflow-connector connector-1" aria-hidden="true" /><div className="workflow-connector connector-2" aria-hidden="true" /><div className="workflow-connector connector-3" aria-hidden="true" /><div className="workflow-moving-dot" aria-hidden="true" />{workflowSteps.map((step) => <WorkflowCard key={step.number} step={step} active={activeStep === step.number} cardRef={(node) => { cardRefs.current[step.number] = node; }} />)}</div><p className="workflow-complete">ヒアリングから実装まで、現場のそばで一貫して伴走する。</p><div className="workflow-to-skills" aria-hidden="true"><span /><i /><b /></div></div></section>;
 }
 
 function SkillsSection() {
-  return <section id="skills" className="motion-stage-section skills-motion"><div className="motion-stage skills-stage"><div className="skills-heading"><p className="eyebrow">CAPABILITIES</p><h2>課題を解決する<strong>プロダクトを。</strong></h2><p className="skills-support">業務設計、AI、自動化、Web開発。必要な技術を組み合わせ、現場で機能する形までつくります。</p></div><div className="skills-network" aria-hidden="true"><span className="network-ring ring-1" /><span className="network-ring ring-2" /><span className="network-ring ring-3" /><span className="network-node node-1" /><span className="network-node node-2" /><span className="network-node node-3" /><span className="network-node node-4" /><span className="network-node node-5" /><span className="network-line n-line-1" /><span className="network-line n-line-2" /><span className="network-line n-line-3" /><span className="network-line n-line-4" /></div><div className="skills-number" aria-hidden="true">01</div><div className="skills-panels">{skills.map((skill, index) => <div key={skill} className="skill-panel"><p>0{index + 1} / CAPABILITY</p><h3>{skill}</h3><span>課題と技術をつなぎ、実装まで進める。</span></div>)}</div><div className="skills-to-works"><span>FROM SYSTEM TO WORKS</span><i /></div></div></section>;
+  return <section id="skills" className="motion-stage-section skills-motion"><div className="motion-stage skills-stage"><span className="section-index-static" aria-hidden="true">3</span><div className="skills-heading"><p className="eyebrow">CAPABILITIES</p><h2>課題を解決する<strong>プロダクトを。</strong></h2><p className="skills-support">業務設計、AI、自動化、Web開発。必要な技術を組み合わせ、現場で機能する形までつくります。</p></div><div className="skills-network" aria-hidden="true"><span className="network-ring ring-1" /><span className="network-ring ring-2" /><span className="network-ring ring-3" /><span className="network-node node-1" /><span className="network-node node-2" /><span className="network-node node-3" /><span className="network-node node-4" /><span className="network-node node-5" /><span className="network-line n-line-1" /><span className="network-line n-line-2" /><span className="network-line n-line-3" /><span className="network-line n-line-4" /></div><div className="skills-panels">{skills.map((skill, index) => <div key={skill} className="skill-panel"><p>0{index + 1} / CAPABILITY</p><h3>{skill}</h3><span>課題と技術をつなぎ、実装まで進める。</span></div>)}</div><div className="skills-to-works"><span>FROM SYSTEM TO WORKS</span><i /></div></div></section>;
 }
 
 function WorksTransitionSection() {
-  return <section id="works" className="motion-stage-section works-transition-motion"><div className="motion-stage works-transition-stage"><div className="works-transition-grid" aria-hidden="true" /><div className="works-transition-heading"><p className="eyebrow">SELECTED WORKS</p><h2 aria-label="現場の不便を、使われるプロダクトへ。"><span className="works-line" aria-hidden="true">現場の不便を、</span><span className="works-line works-line-strong" aria-hidden="true">使われるプロダクトへ。</span></h2></div><div className="works-seed" aria-hidden="true"><span /><span /><span /><span /></div><div className="gallery-camera">{galleryCards.map((card) => <GalleryCard key={card.id} card={card} />)}</div></div></section>;
+  return <section id="works" className="motion-stage-section works-transition-motion"><div className="motion-stage works-transition-stage"><span className="section-index-static" aria-hidden="true">4</span><div className="works-transition-grid" aria-hidden="true" /><div className="works-transition-heading"><p className="eyebrow">SELECTED WORKS</p><h2 aria-label="現場の不便を、使われるプロダクトへ。"><span className="works-line" aria-hidden="true">現場の不便を、</span><span className="works-line works-line-strong" aria-hidden="true">使われるプロダクトへ。</span></h2></div><div className="works-seed" aria-hidden="true"><span /><span /><span /><span /></div><div className="gallery-camera">{galleryCards.map((card) => <GalleryCard key={card.id} card={card} />)}</div></div></section>;
 }
 
 function GalleryCard({ card }: { card: (typeof galleryCards)[number] }) {
@@ -277,7 +285,7 @@ function GalleryCard({ card }: { card: (typeof galleryCards)[number] }) {
 }
 
 function ContactSection() {
-  return <section id="contact" className="contact-section content-section"><div className="section-kicker"><span>08</span><span>CONTACT</span></div><AbstractCore className="contact-core" /><div className="contact-copy"><p className="eyebrow">LET&apos;S MAKE IT USEFUL</p><h2>その「こうだったらいいのに」を、<br /><strong>聞かせてください。</strong></h2><p>まだ輪郭のない相談でも大丈夫です。課題を一緒に整理し、最初の一歩をつくります。</p><a href="mailto:hello@example.com" className="contact-button">お問い合わせはこちら <span>↗</span></a></div></section>;
+  return <section id="contact" className="contact-section content-section"><span className="section-index-static" aria-hidden="true">5</span><div className="section-kicker"><span>05</span><span>CONTACT</span></div><AbstractCore className="contact-core" /><div className="contact-copy"><p className="eyebrow">LET&apos;S MAKE IT USEFUL</p><h2>その「こうだったらいいのに」を、<br /><strong>聞かせてください。</strong></h2><p>まだ輪郭のない相談でも大丈夫です。課題を一緒に整理し、最初の一歩をつくります。</p><a href="mailto:hello@example.com" className="contact-button">お問い合わせはこちら <span>↗</span></a></div></section>;
 }
 
 export default function Home() {
@@ -299,8 +307,11 @@ export default function Home() {
     let resizeTimer = 0;
     let rebuildTimer = 0;
     let motionContext: gsap.Context | null = null;
+    let sectionIndexContext: gsap.Context | null = null;
     let pageTriggers: ScrollTrigger[] = [];
     let pageTimelines: gsap.core.Timeline[] = [];
+    let sectionIndexTriggers: ScrollTrigger[] = [];
+    let sectionIndexTimelines: gsap.core.Timeline[] = [];
     const lenis = activeProfile.isMobile || activeProfile.isTablet
       ? null
       : new Lenis({ lerp: .08, smoothWheel: true, syncTouch: false });
@@ -314,8 +325,9 @@ export default function Home() {
         ".hero-video-overlay", ".hero-copy", ".hero-copy .eyebrow", ".hero-copy .hero-line > span", ".hero-core-wrap", ".hero-core", ".hero-core .core-orbit", ".hero-bridge-copy",
         ".about-motion .bridge-core", ".about-motion .bridge-core .core-orbit", ".about-motion .about-copy", ".about-motion .about-copy .eyebrow", ".about-motion .about-copy h2", ".about-motion .about-copy > p:not(.eyebrow)", ".about-motion .about-tags", ".about-motion .about-visual", ".about-motion .about-visual-glow", ".about-motion .about-portrait", ".about-motion .about-visual-node", ".about-motion .about-visual-caption",
         ".workflow-motion .workflow-card", ".workflow-motion .graphic-ring", ".workflow-motion .graphic-dot", ".workflow-motion .workflow-connector", ".workflow-motion .workflow-complete", ".workflow-motion .workflow-to-skills",
-        ".skills-motion .skill-panel", ".skills-motion .skills-number", ".skills-motion .network-ring", ".skills-motion .skills-network", ".skills-motion .skills-heading", ".skills-motion .skills-heading .eyebrow", ".skills-motion .skills-heading h2", ".skills-motion .skills-support", ".skills-motion .skills-to-works",
+        ".skills-motion .skill-panel", ".skills-motion .network-ring", ".skills-motion .skills-network", ".skills-motion .skills-heading", ".skills-motion .skills-heading .eyebrow", ".skills-motion .skills-heading h2", ".skills-motion .skills-support", ".skills-motion .skills-to-works",
         ".works-transition-motion .works-line", ".works-transition-motion .works-transition-heading", ".works-transition-motion .works-seed", ".works-transition-motion .gallery-camera",
+        ".section-index-stage .section-index-number",
       ].join(","));
       gsap.set(resetTargets, { clearProps: "all" });
       galleryCards.forEach((card) => {
@@ -326,7 +338,90 @@ export default function Home() {
       });
     };
 
+    const cleanupSectionIndex = () => {
+      sectionIndexTriggers.forEach((trigger) => trigger.kill());
+      sectionIndexTriggers = [];
+      sectionIndexTimelines.forEach((timeline) => timeline.kill());
+      sectionIndexTimelines = [];
+      sectionIndexContext?.revert();
+      sectionIndexContext = null;
+      gsap.set(root.querySelectorAll<HTMLElement>(".section-index-stage .section-index-number"), { clearProps: "all" });
+    };
+
+    const buildSectionIndex = (profile: ViewportProfile) => {
+      cleanupSectionIndex();
+      if (profile.isMobile || profile.isTablet) return;
+      const stage = root.querySelector<HTMLElement>(".section-index-stage");
+      if (!stage) return;
+
+      // These pixel distances are based on the current About range at 1512x982:
+      // 45% of its 1,227px trigger range for entry and 18% for exit.
+      const ENTRY_SCROLL_DISTANCE = 552;
+      const EXIT_SCROLL_DISTANCE = 221;
+      const ENTRY_Y = "30vh";
+      const EXIT_Y = "-10vh";
+      const TARGET_OPACITY = .1;
+
+      sectionIndexContext = gsap.context(() => {
+        const createSectionNumberAnimation = ({ number, section, isContact }: { number: HTMLElement; section: HTMLElement; isContact: boolean }) => {
+          const sectionStart = () => isContact
+            ? section.offsetTop - window.innerHeight
+            : section.offsetTop;
+          const sectionEnd = () => isContact
+            ? section.offsetTop + section.offsetHeight
+            : section.offsetTop + section.offsetHeight - window.innerHeight;
+
+          gsap.set(number, {
+            autoAlpha: 0,
+            x: 0,
+            xPercent: 0,
+            y: ENTRY_Y,
+            scale: 1,
+            rotation: 0,
+            skewX: 0,
+            skewY: 0,
+          });
+
+          const entryTimeline = gsap.timeline({ paused: true })
+            .to(number, { autoAlpha: 0, x: 0, xPercent: 0, y: ENTRY_Y, scale: 1, duration: .1, ease: "none" })
+            .to(number, { autoAlpha: TARGET_OPACITY, x: 0, xPercent: 0, y: 0, scale: 1, duration: .9, ease: "none" });
+          const exitTimeline = gsap.timeline({ paused: true })
+            .to(number, { autoAlpha: 0, x: 0, xPercent: 0, y: EXIT_Y, scale: 1, duration: 1, ease: "none" });
+
+          const entryTrigger = ScrollTrigger.create({
+            id: `section-index-${section.id}-entry`,
+            trigger: section,
+            start: () => sectionStart(),
+            end: () => sectionStart() + ENTRY_SCROLL_DISTANCE,
+            scrub: .7,
+            animation: entryTimeline,
+            invalidateOnRefresh: true,
+          });
+          const exitTrigger = ScrollTrigger.create({
+            id: `section-index-${section.id}-exit`,
+            trigger: section,
+            start: () => sectionEnd() - EXIT_SCROLL_DISTANCE,
+            end: () => sectionEnd(),
+            scrub: .7,
+            animation: exitTimeline,
+            invalidateOnRefresh: true,
+          });
+
+          sectionIndexTimelines.push(entryTimeline, exitTimeline);
+          sectionIndexTriggers.push(entryTrigger, exitTrigger);
+        };
+
+        sectionIndexes.forEach((item) => {
+          const number = root.querySelector<HTMLElement>(`[data-section-index="${item.id}"]`);
+          const section = root.querySelector<HTMLElement>(`#${item.id}`);
+          if (!number || !section) return;
+          createSectionNumberAnimation({ number, section, isContact: item.id === "contact" });
+        });
+      }, stage);
+    };
+
     const cleanupMotion = () => {
+      cleanupSectionIndex();
       pageTriggers.forEach((trigger) => trigger.kill());
       pageTriggers = [];
       pageTimelines.forEach((timeline) => timeline.kill());
@@ -339,6 +434,7 @@ export default function Home() {
     const buildMotion = (profile: ViewportProfile) => {
       root.dataset.pcTier = profile.pcTier;
       root.dataset.motionMode = profile.isMobile ? "mobile" : profile.isTablet ? "tablet" : "pc";
+      buildSectionIndex(profile);
       if (profile.isMobile || profile.isTablet) return;
       motionContext = gsap.context(() => {
         const pin = (section: string, stage: string, animation: gsap.core.Timeline) => {
@@ -405,10 +501,9 @@ export default function Home() {
         const skillsTl = gsap.timeline();
         gsap.set(skillPanels, { autoAlpha: 0, pointerEvents: "none", y: 25, scale: .92 });
         gsap.set(".skills-motion .skills-heading .eyebrow, .skills-motion .skills-heading h2, .skills-motion .skills-support", { opacity: 0, y: 12 });
-        gsap.set(".skills-motion .skills-number", { opacity: 0 });
         gsap.set(".skills-motion .skills-network", { opacity: 0, scale: .96 });
-        skillsTl.to(".skills-motion .skills-heading .eyebrow", { opacity: 1, y: 0, duration: .08 }, .04).to(".skills-motion .skills-heading h2", { opacity: 1, y: 0, duration: .1 }, .08).to(".skills-motion .skills-support", { opacity: 1, y: 0, duration: .1 }, .12).to(".skills-motion .skills-network", { opacity: 1, scale: 1, duration: .14 }, .2).to(".skills-motion .skills-number", { opacity: 1, duration: .08 }, .24);
-        skillPanels.forEach((panel, index) => { const start = .32 + index * .1; skillsTl.addLabel(`capability-${String(index + 1).padStart(2, "0")}`, start + .08).set(skillPanels, { autoAlpha: 0, pointerEvents: "none" }, start).to(".skills-motion .skills-number", { textContent: String(index + 1).padStart(2, "0"), duration: .01 }, start).to(panel, { autoAlpha: 1, pointerEvents: "auto", y: 0, scale: 1, duration: .06 }, start + .02).to(`.skills-motion .network-ring:nth-of-type(${(index % 3) + 1})`, { rotation: "+=55", scale: 1.12 + index * .03, duration: .16 }, start); });
+        skillsTl.to(".skills-motion .skills-heading .eyebrow", { opacity: 1, y: 0, duration: .08 }, .04).to(".skills-motion .skills-heading h2", { opacity: 1, y: 0, duration: .1 }, .08).to(".skills-motion .skills-support", { opacity: 1, y: 0, duration: .1 }, .12).to(".skills-motion .skills-network", { opacity: 1, scale: 1, duration: .14 }, .2);
+        skillPanels.forEach((panel, index) => { const start = .32 + index * .1; skillsTl.addLabel(`capability-${String(index + 1).padStart(2, "0")}`, start + .08).set(skillPanels, { autoAlpha: 0, pointerEvents: "none" }, start).to(panel, { autoAlpha: 1, pointerEvents: "auto", y: 0, scale: 1, duration: .06 }, start + .02).to(`.skills-motion .network-ring:nth-of-type(${(index % 3) + 1})`, { rotation: "+=55", scale: 1.12 + index * .03, duration: .16 }, start); });
         skillsTl.to(".skills-motion .skills-network", { scale: .58, x: 0, y: "-18vh", duration: .2 }, .88).to(".skills-motion .skills-heading", { opacity: 0, y: "-2vh", duration: .16 }, .88).to(".skills-motion .skills-to-works", { opacity: 1, y: 0, duration: .16 }, .92).addLabel("skills-complete");
         pageTimelines.push(skillsTl);
         pin(".skills-motion", ".skills-stage", skillsTl);
@@ -491,5 +586,5 @@ export default function Home() {
     };
   }, []);
 
-  return <main ref={rootRef} className="animated-portfolio"><Header /><ScrollProgress progress={progress} /><ScrollDial progress={progress} isScrolling={isScrolling} /><HeroSection /><AboutSection /><WorkflowSection /><SkillsSection /><WorksTransitionSection /><ContactSection /><footer className="site-footer"><span>Tsubasa&apos;s Portfolio</span><span>AI ENGINEER / PRODUCT BUILDER</span><span>© 2026 Tsubasa</span></footer></main>;
+  return <main ref={rootRef} className="animated-portfolio"><Header /><div className="section-index-stage" aria-hidden="true">{sectionIndexes.map((item) => <span key={item.id} data-section-index={item.id} className="section-index-number">{item.number}</span>)}</div><ScrollProgress progress={progress} /><ScrollDial progress={progress} isScrolling={isScrolling} /><HeroSection /><AboutSection /><WorkflowSection /><SkillsSection /><WorksTransitionSection /><ContactSection /><footer className="site-footer"><span>Tsubasa&apos;s Portfolio</span><span>AI ENGINEER / PRODUCT BUILDER</span><span>© 2026 Tsubasa</span></footer></main>;
 }

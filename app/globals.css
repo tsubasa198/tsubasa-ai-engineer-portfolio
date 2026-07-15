@@ -1303,3 +1303,96 @@ img, video { max-width: 100%; }
   .animated-portfolio .gallery-card { opacity: 1 !important; visibility: visible !important; transform: none !important; }
   .animated-portfolio .works-transition-stage .gallery-card.support-work-card { display: block; }
 }
+
+/* Section index transitions: decorative, independent from the section timelines. */
+.animated-portfolio .about-stage,
+.animated-portfolio .workflow-stage,
+.animated-portfolio .skills-stage,
+.animated-portfolio .works-transition-stage,
+.animated-portfolio .contact-section { position: relative; }
+
+.animated-portfolio .section-index-stage,
+.animated-portfolio .section-index-static { display: none; }
+
+.animated-portfolio .about-stage::after,
+.animated-portfolio .workflow-stage::after,
+.animated-portfolio .skills-stage::after,
+.animated-portfolio .gallery-stage::after,
+.animated-portfolio .works-transition-stage::after {
+  content: none !important;
+  display: none !important;
+}
+
+.animated-portfolio .contact-section .section-kicker { display: none !important; }
+
+.animated-portfolio .section-index-stage {
+  pointer-events: none;
+  user-select: none;
+  overflow: visible;
+}
+
+.animated-portfolio .section-index-number,
+.animated-portfolio .section-index-static {
+  pointer-events: none;
+  user-select: none;
+  font-family: inherit;
+  font-weight: 700;
+  line-height: .8;
+  letter-spacing: -.08em;
+  background: linear-gradient(135deg, rgba(86, 231, 255, .9), rgba(69, 135, 255, .72) 52%, rgba(179, 104, 255, .78));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+@media (min-width: 1280px) and (prefers-reduced-motion: no-preference) {
+  .animated-portfolio .section-index-stage {
+    display: block;
+    position: fixed;
+    z-index: 1;
+    left: clamp(32px, 3vw, 56px);
+    top: clamp(32px, 14vh, 152px);
+    width: min(36vw, 560px);
+    height: 72vh;
+    overflow: visible;
+  }
+
+  .animated-portfolio .section-index-number {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: max-content;
+    display: block;
+    padding: .08em .04em;
+    font-size: clamp(200px, 22vw, 420px);
+    line-height: 1;
+    letter-spacing: -.04em;
+    opacity: 0;
+    visibility: hidden;
+    will-change: transform, opacity;
+  }
+}
+
+@media (max-width: 1279px), (prefers-reduced-motion: reduce) {
+  .animated-portfolio .section-index-stage { display: none !important; }
+
+  .animated-portfolio .section-index-static {
+    display: block;
+    position: absolute;
+    z-index: 0;
+    left: clamp(16px, 4vw, 54px);
+    top: clamp(20px, 5vh, 72px);
+    padding: .08em .04em;
+    font-size: clamp(88px, 25vw, 160px);
+    line-height: 1;
+    letter-spacing: -.04em;
+    opacity: .075;
+    overflow: visible;
+    white-space: nowrap;
+  }
+
+  .animated-portfolio .contact-section > .section-index-static {
+    top: clamp(18px, 4vh, 56px);
+  }
+}
